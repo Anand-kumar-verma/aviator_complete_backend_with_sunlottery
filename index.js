@@ -416,7 +416,7 @@ async function table_generateround() {
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     setTimeout(() => {
-      // generateAndSendMessage("yes");
+      generateAndSendMessage("yes");
       x = false;
     }, secondsUntilNextMinute * 1000);
   }
@@ -539,13 +539,14 @@ async function generateAndSendMessage(data) {
 
     if (loss_amount !== 0 && bet_sum !== 0) {
       if (get_counter >= 3) {
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+
         this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
           bet_sum
         );
-        clearInterval(timerInterval);
-        clearInterval(crashInterval);
-        clearInterval(timerInterval);
-        clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
@@ -580,6 +581,10 @@ async function generateAndSendMessage(data) {
           find_any_loss_amount_match_with_60_percent?.[0] &&
           find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount > bet_sum
         ) {
+          clearInterval(timerInterval);
+          clearInterval(crashInterval);
+          clearInterval(timerInterval);
+          clearInterval(crashInterval);
           const remaining_amount =
             find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount -
             bet_sum;
@@ -595,10 +600,6 @@ async function generateAndSendMessage(data) {
                   bet_sum,
               }
             );
-            clearInterval(timerInterval);
-            clearInterval(crashInterval);
-            clearInterval(timerInterval);
-            clearInterval(crashInterval);
             thisFunctonMustBePerFormAfterCrash(
               Number(`${seconds + 1}.${milliseconds}`)
             );
@@ -607,6 +608,10 @@ async function generateAndSendMessage(data) {
         } else {
           /////////////////// means bet_amount jyada hai ////////////////////
           if (find_any_loss_amount_match_with_60_percent?.[0]) {
+            clearInterval(timerInterval);
+            clearInterval(crashInterval);
+            clearInterval(timerInterval);
+            clearInterval(crashInterval);
             await LossTable.findByIdAndDelete({
               _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
             });
@@ -616,10 +621,7 @@ async function generateAndSendMessage(data) {
             this_is_recusive_function_for_remove_all_lossAmount(
               total_value_bet_amount_which_is_grater_than_lossAmount
             );
-            clearInterval(timerInterval);
-            clearInterval(crashInterval);
-            clearInterval(timerInterval);
-            clearInterval(crashInterval);
+           
             thisFunctonMustBePerFormAfterCrash(
               Number(`${seconds + 1}.${milliseconds}`)
             );
@@ -700,6 +702,10 @@ async function generateAndSendMessage(data) {
     ////////////////////// conndition is that means agar cashout 60% se jyada huaa to crash kra do///////////////
 
     if (cash_out_sum > total_amount_ka_60_percent) {
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
       counterboolean = false;
       ///////////////// this is the condition that means if cashout is grater than //////////////////////
       if (cash_out_sum > bet_sum) {
@@ -709,10 +715,7 @@ async function generateAndSendMessage(data) {
         const response = await obj.save();
         // await CashOut.deleteMany({});
       }
-      clearInterval(timerInterval);
-      clearInterval(crashInterval);
-      clearInterval(timerInterval);
-      clearInterval(crashInterval);
+      
       thisFunctonMustBePerFormAfterCrash(
         Number(`${seconds + 1}.${milliseconds}`)
       );
@@ -756,6 +759,10 @@ async function generateAndSendMessage(data) {
       find_any_loss_amount_match_with_60_percent?.[0] &&
       find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount > bet_sum
     ) {
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
       const remaining_amount =
         find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount - bet_sum;
       if (
@@ -770,10 +777,7 @@ async function generateAndSendMessage(data) {
               bet_sum,
           }
         );
-        clearInterval(timerInterval);
-        clearInterval(crashInterval);
-        clearInterval(timerInterval);
-        clearInterval(crashInterval);
+       
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
@@ -821,6 +825,10 @@ async function generateAndSendMessage(data) {
         remaining_amount > 0 &&
         find_any_loss_amount_match_with_60_percent?.[0]
       ) {
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
         await LossTable.findByIdAndUpdate(
           { _id: find_any_loss_amount_match_with_60_percent?.[0]?._id },
           {
@@ -829,10 +837,7 @@ async function generateAndSendMessage(data) {
               bet_sum,
           }
         );
-        clearInterval(timerInterval);
-        clearInterval(crashInterval);
-        clearInterval(timerInterval);
-        clearInterval(crashInterval);
+       
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
