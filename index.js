@@ -416,7 +416,7 @@ async function table_generateround() {
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     setTimeout(() => {
-      // generateAndSendMessage("yes");
+      generateAndSendMessage("yes");
       x = false;
     }, secondsUntilNextMinute * 1000);
   }
@@ -858,7 +858,7 @@ async function generateAndSendMessage(data) {
     clearInterval(crashInterval);
     clearInterval(timerInterval);
     clearInterval(crashInterval);
-    console.log("thisFunctonMustBePerFormAfterCrash HOOOOOOO crached")
+    console.log("thisFunctonMustBePerFormAfterCrash HOOOOOOO crached");
     const round = await GameRound?.find({});
     const obj = new GameHistory({
       round: round?.[0]?.round,
@@ -870,12 +870,17 @@ async function generateAndSendMessage(data) {
     io.emit("setcolorofdigit", true);
     io.emit("apply_bet_counter", []);
     io.emit("cash_out_counter", []);
-  
 
     // copy all bet into ledger
     const applyBet_data = await applyBet.find();
     for (const entry of applyBet_data) {
-      const newEntry = new ApplyBetLedger(entry.toObject());
+      // Create a copy of the entry object without the _id field
+      const { _id, ...entryWithoutId } = entry.toObject();
+
+      // Create a new ApplyBetLedger object without the _id
+      const newEntry = new ApplyBetLedger(entryWithoutId);
+
+      // Save the new entry
       await newEntry.save();
     }
     await applyBet.deleteMany({});
