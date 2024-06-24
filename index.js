@@ -416,7 +416,7 @@ async function table_generateround() {
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     setTimeout(() => {
-      // generateAndSendMessage("yes");
+      generateAndSendMessage("yes");
       x = false;
     }, secondsUntilNextMinute * 1000);
   }
@@ -462,6 +462,10 @@ async function generateAndSendMessage(data) {
 
     const newTime = fly_time + 1;
     if (newTime >= time) {
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
       thisFunctonMustBePerFormAfterCrash(
         Number(`${seconds + 1}.${milliseconds}`)
       );
@@ -538,12 +542,20 @@ async function generateAndSendMessage(data) {
         this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
           bet_sum
         );
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
       }
       if (loss_amount <= bet_sum) {
         counterboolean = false;
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
@@ -583,6 +595,10 @@ async function generateAndSendMessage(data) {
                   bet_sum,
               }
             );
+            clearInterval(timerInterval);
+            clearInterval(crashInterval);
+            clearInterval(timerInterval);
+            clearInterval(crashInterval);
             thisFunctonMustBePerFormAfterCrash(
               Number(`${seconds + 1}.${milliseconds}`)
             );
@@ -600,6 +616,10 @@ async function generateAndSendMessage(data) {
             this_is_recusive_function_for_remove_all_lossAmount(
               total_value_bet_amount_which_is_grater_than_lossAmount
             );
+            clearInterval(timerInterval);
+            clearInterval(crashInterval);
+            clearInterval(timerInterval);
+            clearInterval(crashInterval);
             thisFunctonMustBePerFormAfterCrash(
               Number(`${seconds + 1}.${milliseconds}`)
             );
@@ -668,6 +688,10 @@ async function generateAndSendMessage(data) {
 
     /////////// conditoin for that if total amount is grater or equal that 500 Rs. creash ////////////////////
     if (total_bet_candidate <= 5 && bet_sum >= 500) {
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
       thisFunctonMustBePerFormAfterCrash(
         Number(`${seconds + 1}.${milliseconds}`)
       );
@@ -685,6 +709,10 @@ async function generateAndSendMessage(data) {
         const response = await obj.save();
         // await CashOut.deleteMany({});
       }
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
       thisFunctonMustBePerFormAfterCrash(
         Number(`${seconds + 1}.${milliseconds}`)
       );
@@ -694,6 +722,10 @@ async function generateAndSendMessage(data) {
     //////////////////// agar bet lgi hui hai to  second 4 se jyada nhi hone chahiye (+1 krna pdega hmesa q ki ui me +1 karke dikhaya gya hai each and everything)
     if (bet_sum > 0) {
       if (Number(seconds >= 3)) {
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
@@ -738,6 +770,10 @@ async function generateAndSendMessage(data) {
               bet_sum,
           }
         );
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
@@ -793,6 +829,10 @@ async function generateAndSendMessage(data) {
               bet_sum,
           }
         );
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
@@ -814,6 +854,10 @@ async function generateAndSendMessage(data) {
   }
 
   async function thisFunctonMustBePerFormAfterCrash(time) {
+    clearInterval(timerInterval);
+    clearInterval(crashInterval);
+    clearInterval(timerInterval);
+    clearInterval(crashInterval);
     console.log("thisFunctonMustBePerFormAfterCrash HOOOOOOO crached")
     const round = await GameRound?.find({});
     const obj = new GameHistory({
@@ -826,10 +870,7 @@ async function generateAndSendMessage(data) {
     io.emit("setcolorofdigit", true);
     io.emit("apply_bet_counter", []);
     io.emit("cash_out_counter", []);
-    clearInterval(timerInterval);
-    clearInterval(crashInterval);
-    clearInterval(timerInterval);
-    clearInterval(crashInterval);
+  
 
     // copy all bet into ledger
     const applyBet_data = await applyBet.find();
