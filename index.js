@@ -416,7 +416,7 @@ async function table_generateround() {
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     setTimeout(() => {
-      generateAndSendMessage("yes");
+      // generateAndSendMessage("yes");
       x = false;
     }, secondsUntilNextMinute * 1000);
   }
@@ -740,7 +740,7 @@ async function generateAndSendMessage(data) {
     }
 
     // console.log(cash_out_sum, "cash out sum");
-  }, 900);
+  }, 1000);
 
   async function this_is_recusive_function_for_remove_all_lossAmount(bet_sum) {
     const percent_60_bet_amount = bet_sum * (100 / 60);
