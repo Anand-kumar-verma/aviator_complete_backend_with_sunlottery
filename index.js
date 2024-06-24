@@ -416,7 +416,7 @@ async function table_generateround() {
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     setTimeout(() => {
-      generateAndSendMessage("yes");
+      // generateAndSendMessage("yes");
       x = false;
     }, secondsUntilNextMinute * 1000);
   }
