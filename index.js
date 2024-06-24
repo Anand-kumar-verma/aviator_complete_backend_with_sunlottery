@@ -416,7 +416,7 @@ async function table_generateround() {
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     setTimeout(() => {
-      generateAndSendMessage("yes");
+      // generateAndSendMessage("yes");
       x = false;
     }, secondsUntilNextMinute * 1000);
   }
@@ -814,6 +814,7 @@ async function generateAndSendMessage(data) {
   }
 
   async function thisFunctonMustBePerFormAfterCrash(time) {
+    console.log("thisFunctonMustBePerFormAfterCrash HOOOOOOO crached")
     const round = await GameRound?.find({});
     const obj = new GameHistory({
       round: round?.[0]?.round,
