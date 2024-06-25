@@ -405,12 +405,12 @@ app.get("/api/v1/topw11winningInformation", async (req, res) => {
 ///////////////////////////// aviaot timer ///////////////////////////
 let x = true;
 async function table_generateround() {
-  const data = await GameRound.insertMany({
-    round: 202410,
-  });
+  // const data = await GameRound.insertMany({
+  //   round: 202410,
+  // });
 
   if (x) {
-    generateAndSendMessage("yes");
+    // generateAndSendMessage("yes");
 
     console.log("Waiting for the next minute to start...");
     const now = new Date();
@@ -425,12 +425,12 @@ table_generateround();
 
 async function generateAndSendMessage(data) {
   if (data === "no") return;
-  const round = await GameRound?.find({});
+  // const round = await GameRound?.find({});
 
-  const newround = await GameRound.findOneAndUpdate(
-    { _id: round?.[0]?._id },
-    { $inc: { round: 1 } }
-  );
+  // const newround = await GameRound.findOneAndUpdate(
+  //   { _id: round?.[0]?._id },
+  //   { $inc: { round: 1 } }
+  // );
 
   let timerInterval;
   let crashInterval;
@@ -481,7 +481,6 @@ async function generateAndSendMessage(data) {
   let loss_amount = 0;
   let get_counter = 0;
   crashInterval = setInterval(async () => {
-    console.log(bet_data, "this is array data");
     const set_counter = await SetCounter.find({});
     get_counter = set_counter?.[0]?.counter || 0;
 
@@ -491,50 +490,24 @@ async function generateAndSendMessage(data) {
 
     ///////////////////////////////
     if (bet_sum <= 0) {
-      bet_sum = await applyBet
-        .aggregate([
-          {
-            $group: {
-              _id: null,
-              totalAmount: { $sum: "$amount" },
-            },
-          },
-        ])
-        .then((result) => {
-          return result.length > 0 ? result[0].totalAmount : 0;
-        });
-
-      //////////////////  total count of bet ///////////////
-
-      const all_data = await applyBet.find({});
-      total_bet_candidate = all_data?.length;
+      bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
+      total_bet_candidate = bet_data?.length;
     }
 
     /////////////////////// total loss ////////////////////////
-    loss_amount = await LossTable.aggregate([
-      {
-        $group: {
-          _id: null,
-          totalAmount: { $sum: "$lossAmount" },
-        },
-      },
-    ]).then((result) => {
-      return result.length > 0 ? result[0].totalAmount : 0;
-    });
+    // loss_amount = await LossTable.aggregate([
+    //   {
+    //     $group: {
+    //       _id: null,
+    //       totalAmount: { $sum: "$lossAmount" },
+    //     },
+    //   },
+    // ]).then((result) => {
+    //   return result.length > 0 ? result[0].totalAmount : 0;
+    // });
 
     ////////////////// cashout sum /////////////////////////
-    const cash_out_sum = await applyBet
-      .aggregate([
-        {
-          $group: {
-            _id: null,
-            totalAmount: { $sum: "$amountcashed" },
-          },
-        },
-      ])
-      .then((result) => {
-        return result.length > 0 ? result[0].totalAmount : 0;
-      });
+    const cash_out_sum = bet_data?.reduce((a, b) => a + b?.amountcashed, 0);
 
     /////////////////// condition for loss amount //////////////////////////
 
@@ -618,9 +591,11 @@ async function generateAndSendMessage(data) {
             await LossTable.findByIdAndDelete({
               _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
             });
+
             const total_value_bet_amount_which_is_grater_than_lossAmount =
               bet_sum -
               find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount;
+
             this_is_recusive_function_for_remove_all_lossAmount(
               total_value_bet_amount_which_is_grater_than_lossAmount
             );
@@ -664,21 +639,21 @@ async function generateAndSendMessage(data) {
       clearInterval(crashInterval);
       clearInterval(timerInterval);
       clearInterval(crashInterval);
-
       counterboolean = false;
       ///////////////// this is the condition that means if cashout is grater than //////////////////////
       if (cash_out_sum > bet_sum) {
-        const obj = new LossTable({
-          lossAmount: cash_out_sum - bet_sum,
-        });
-        const response = await obj.save();
-        // await CashOut.deleteMany({});
+        thisFunctonMustBePerFormAfterCrash(
+          Number(`${seconds + 1}.${milliseconds}`),
+          "sixty_percent_se_jyada_ka_crash"
+        );
+        return;
+      } else {
+        thisFunctonMustBePerFormAfterCrash(
+          Number(`${seconds + 1}.${milliseconds}`),
+          "null"
+        );
+        return;
       }
-
-      thisFunctonMustBePerFormAfterCrash(
-        Number(`${seconds + 1}.${milliseconds}`)
-      );
-      return;
       ///////////////// this is the condition that means if cashout is grater than //////////////////////
     }
     //////////////////// agar bet lgi hui hai to  second 4 se jyada nhi hone chahiye (+1 krna pdega hmesa q ki ui me +1 karke dikhaya gya hai each and everything)
@@ -694,7 +669,7 @@ async function generateAndSendMessage(data) {
         return;
       }
     }
-  }, 1000);
+  }, 500);
 
   async function this_is_recusive_function_for_remove_all_lossAmount(bet_sum) {
     const percent_60_bet_amount = bet_sum * (100 / 60);
@@ -817,24 +792,32 @@ async function generateAndSendMessage(data) {
     }
   }
 
-  async function thisFunctonMustBePerFormAfterCrash(time) {
-    bet_data = []
+  async function thisFunctonMustBePerFormAfterCrash(time, msg) {
     clearInterval(timerInterval);
     clearInterval(crashInterval);
     clearInterval(timerInterval);
     clearInterval(crashInterval);
     console.log("thisFunctonMustBePerFormAfterCrash HOOOOOOO crached");
-    const round = await GameRound?.find({});
-    const obj = new GameHistory({
-      round: round?.[0]?.round,
-      multiplier: time,
-    });
-    const response = await obj.save();
+    // const round = await GameRound?.find({});
+    // const obj = new GameHistory({
+    //   round: round?.[0]?.round,
+    //   multiplier: time,
+    // });
+    // const response = await obj.save();
     io.emit("crash", true);
     io.emit("isFlying", false);
     io.emit("setcolorofdigit", true);
     io.emit("apply_bet_counter", []);
     io.emit("cash_out_counter", []);
+
+    if (msg === "sixty_percent_se_jyada_ka_crash") {
+      const bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
+      const cash_out_sum = bet_data?.reduce((a, b) => a + b?.amountcashed, 0);
+      const obj = new LossTable({
+        lossAmount: cash_out_sum - bet_sum,
+      });
+      const response = await obj.save();
+    }
 
     // copy all bet into ledger
     const applyBet_data = await applyBet.find();
@@ -856,6 +839,7 @@ async function generateAndSendMessage(data) {
     }, 3000);
 
     setTimeout(() => {
+      bet_data = [];
       generateAndSendMessage("yes");
     }, 20000);
   }
@@ -873,16 +857,17 @@ app.post("/api/v1/apply-bet", async (req, res) => {
       userid: userid,
       id: id,
       amount: amount,
+      amountcashed: 0,
+      multiplier: 0,
     };
     bet_data.push(new_data);
-    const user = await User.findOne({ _id: userid });
-    const newamount = await User.findByIdAndUpdate(
-      { _id: userid },
-      { wallet: user.wallet - amount }
-    );
+    // const user = await User.findOne({ _id: userid });
+    // const newamount = await User.findByIdAndUpdate(
+    //   { _id: userid },
+    //   { wallet: user.wallet - amount }
+    // );
     return res.status(200).json({
       msg: "Data save successfully",
-      newamount: newamount,
     });
   } catch (e) {
     console.log(e);
@@ -900,21 +885,21 @@ app.post("/api/v1/cash-out", async (req, res) => {
         msg: "All field is required",
       });
 
-    const user = await User.findOne({ _id: userid });
-    const newamount = await User.findByIdAndUpdate(
-      { _id: userid },
-      { wallet: user.wallet + amount }
-    );
+    // const user = await User.findOne({ _id: userid });
+    // const newamount = await User.findByIdAndUpdate(
+    //   { _id: userid },
+    //   { wallet: user.wallet + amount }
+    // );
 
     bet_data.forEach((item) => {
       if (item.id === id) {
-        item.amount += amount;
+        item.amountcashed = amount;
+        item.multiplier = multiplier;
       }
     });
     ////////////////// revert the final response
     return res.status(200).json({
       msg: "Data save successfully",
-      newamount: newamount,
     });
   } catch (e) {
     console.log(e);
