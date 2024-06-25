@@ -414,7 +414,7 @@ async function table_generateround() {
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     setTimeout(() => {
-      generateAndSendMessage("yes")
+      // generateAndSendMessage("yes")
       x = false;
     }, secondsUntilNextMinute * 1000);
   }
@@ -801,7 +801,7 @@ async function generateAndSendMessage(data) {
     io.emit("setcolorofdigit", true);
     io.emit("apply_bet_counter", []);
     io.emit("cash_out_counter", []);
-    
+
     const obj = new GameHistory({
       round: 10000,
       multiplier: time,
@@ -843,7 +843,7 @@ async function generateAndSendMessage(data) {
 
     setTimeout(() => {
       bet_data = [];
-      generateAndSendMessage("yes");
+      // generateAndSendMessage("yes");
     }, 30000);
   }
 }
