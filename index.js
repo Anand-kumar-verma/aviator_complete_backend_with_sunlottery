@@ -408,7 +408,7 @@ async function table_generateround() {
   // });
 
   if (x) {
-    generateAndSendMessage("yes");
+    // generateAndSendMessage("yes");
 
     console.log("Waiting for the next minute to start...");
     const now = new Date();
@@ -421,7 +421,7 @@ async function table_generateround() {
 }
 table_generateround();
 
-async function generateAndSendMessage(data,loss_amount) {
+async function generateAndSendMessage(data, loss_amount,get_counter) {
   if (data === "no") return;
   // const round = await GameRound?.find({});
 
@@ -477,7 +477,6 @@ async function generateAndSendMessage(data,loss_amount) {
   ///////////////////////////////////// thsi is the calculation of total cashout sum
   let bet_sum = 0;
   // let loss_amount = 0;
-  let get_counter = 0;
   crashInterval = setInterval(async () => {
     // const set_counter = await SetCounter.find({});
     // get_counter = set_counter?.[0]?.counter || 0;
@@ -510,20 +509,18 @@ async function generateAndSendMessage(data,loss_amount) {
     /////////////////// condition for loss amount //////////////////////////
 
     if (loss_amount !== 0 && bet_sum !== 0) {
-
-      // if (get_counter >= 3) {
-      //   clearInterval(timerInterval);
-      //   clearInterval(crashInterval);
-      //   clearInterval(timerInterval);
-      //   clearInterval(crashInterval);
-
-      //   this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
-      //     bet_sum
-      //   );
-      //   thisFunctonMustBePerFormAfterCrash(
-      //     Number(`${seconds + 1}.${milliseconds}`)
-      //   );
-      // }
+      if (get_counter >= 3) {
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        // this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
+        //   bet_sum
+        // );
+        thisFunctonMustBePerFormAfterCrash(
+          Number(`${seconds + 1}.${milliseconds}`),"counter_jyada_ho_chuka_hai"
+        );
+      }
 
       if (loss_amount <= bet_sum) {
         counterboolean = false;
@@ -562,20 +559,15 @@ async function generateAndSendMessage(data,loss_amount) {
           const remaining_amount =
             find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount -
             bet_sum;
+
           if (
             remaining_amount > 0 &&
             find_any_loss_amount_match_with_60_percent?.[0]
           ) {
-            await LossTable.findByIdAndUpdate(
-              { _id: find_any_loss_amount_match_with_60_percent?.[0]?._id },
-              {
-                lossAmount:
-                  find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount -
-                  bet_sum,
-              }
-            );
             thisFunctonMustBePerFormAfterCrash(
-              Number(`${seconds + 1}.${milliseconds}`)
+              Number(`${seconds + 1}.${milliseconds}`),
+              "loss_if_loss_jyada_hai_bet_amount_se_aur_60_percent_se_koi_match_bhi_kiya_hai",
+              find_any_loss_amount_match_with_60_percent
             );
             return;
           }
@@ -587,20 +579,21 @@ async function generateAndSendMessage(data,loss_amount) {
             clearInterval(timerInterval);
             clearInterval(crashInterval);
 
-            await LossTable.findByIdAndDelete({
-              _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
-            });
+            // await LossTable.findByIdAndDelete({
+            //   _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
+            // });
 
-            const total_value_bet_amount_which_is_grater_than_lossAmount =
-              bet_sum -
-              find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount;
+            // const total_value_bet_amount_which_is_grater_than_lossAmount =
+            //   bet_sum -
+            //   find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount;
 
-            this_is_recusive_function_for_remove_all_lossAmount(
-              total_value_bet_amount_which_is_grater_than_lossAmount
-            );
+            // this_is_recusive_function_for_remove_all_lossAmount(
+            //   total_value_bet_amount_which_is_grater_than_lossAmount
+            // );
 
             thisFunctonMustBePerFormAfterCrash(
-              Number(`${seconds + 1}.${milliseconds}`)
+              Number(`${seconds + 1}.${milliseconds}`),
+              "recursive_functoin_for_all_removel_amount"
             );
             return;
           } else {
@@ -791,7 +784,11 @@ async function generateAndSendMessage(data,loss_amount) {
     }
   }
 
-  async function thisFunctonMustBePerFormAfterCrash(time, msg) {
+  async function thisFunctonMustBePerFormAfterCrash(
+    time,
+    msg,
+    find_any_loss_amount_match_with_60_percent
+  ) {
     clearInterval(timerInterval);
     clearInterval(crashInterval);
     clearInterval(timerInterval);
@@ -809,7 +806,40 @@ async function generateAndSendMessage(data,loss_amount) {
     //   multiplier: time,
     // });
     // const response = await obj.save();
-   
+
+     if(msg === "counter_jyada_ho_chuka_hai"){
+      let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
+      this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
+        bet_sum
+      );
+     }
+    if (
+      msg ===
+      "loss_if_loss_jyada_hai_bet_amount_se_aur_60_percent_se_koi_match_bhi_kiya_hai"
+    ) {
+     let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
+      await LossTable.findByIdAndUpdate(
+        { _id: find_any_loss_amount_match_with_60_percent?.[0]?._id },
+        {
+          lossAmount:
+            find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount -
+            bet_sum,
+        }
+      );
+    }
+
+    if (msg === "recursive_functoin_for_all_removel_amount") {
+      await LossTable.findByIdAndDelete({
+        _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
+      });
+
+      const total_value_bet_amount_which_is_grater_than_lossAmount =
+        bet_sum - find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount;
+
+      this_is_recusive_function_for_remove_all_lossAmount(
+        total_value_bet_amount_which_is_grater_than_lossAmount
+      );
+    }
 
     if (msg === "sixty_percent_se_jyada_ka_crash") {
       const bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
@@ -842,7 +872,7 @@ async function generateAndSendMessage(data,loss_amount) {
       io.emit("setcolorofdigit", false);
       io.emit("setloder", true);
     }, 3000);
-   let loss_amount = await LossTable.aggregate([
+    let loss_amount = await LossTable.aggregate([
       {
         $group: {
           _id: null,
@@ -852,10 +882,12 @@ async function generateAndSendMessage(data,loss_amount) {
     ]).then((result) => {
       return result.length > 0 ? result[0].totalAmount : 0;
     });
+     const set_counter = await SetCounter.find({});
+   let get_counter = set_counter?.[0]?.counter || 0;
 
     setTimeout(() => {
       bet_data = [];
-      generateAndSendMessage("yes",loss_amount);
+      // generateAndSendMessage("yes", loss_amount,get_counter);
     }, 30000);
   }
 }
