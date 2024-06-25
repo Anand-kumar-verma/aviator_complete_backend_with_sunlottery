@@ -46,8 +46,8 @@ const { createUser, applybetFunction, cashOutFunction, adminWalletFunction, user
 
 ////////////////////// mongo db routes //////////// for aviator
 router.post("/createuser", createUser);
-router.post("/apply-bet", applybetFunction);
-router.post("/cash-out", cashOutFunction);
+// router.post("/apply-bet", applybetFunction);
+// router.post("/cash-out", cashOutFunction);
 router.post("/admin-wallet", adminWalletFunction);
 router.post("/login", userLoginFunctoin);
 router.post("/lossamount", lossAmountFunction);

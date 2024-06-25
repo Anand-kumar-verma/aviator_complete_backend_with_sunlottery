@@ -53,7 +53,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
-
+let bet_data = [];
 app.use("/api/v1", todoRoutes);
 
 // Schedule the function to run daily at 12:00 AM 0 0 * * *
@@ -481,6 +481,7 @@ async function generateAndSendMessage(data) {
   let loss_amount = 0;
   let get_counter = 0;
   crashInterval = setInterval(async () => {
+    console.log(bet_data, "this is array data");
     const set_counter = await SetCounter.find({});
     get_counter = set_counter?.[0]?.counter || 0;
 
@@ -543,7 +544,7 @@ async function generateAndSendMessage(data) {
         clearInterval(crashInterval);
         clearInterval(timerInterval);
         clearInterval(crashInterval);
-       
+
         this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
           bet_sum
         );
@@ -585,7 +586,7 @@ async function generateAndSendMessage(data) {
           clearInterval(crashInterval);
           clearInterval(timerInterval);
           clearInterval(crashInterval);
-       
+
           const remaining_amount =
             find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount -
             bet_sum;
@@ -613,7 +614,7 @@ async function generateAndSendMessage(data) {
             clearInterval(crashInterval);
             clearInterval(timerInterval);
             clearInterval(crashInterval);
-            
+
             await LossTable.findByIdAndDelete({
               _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
             });
@@ -623,7 +624,7 @@ async function generateAndSendMessage(data) {
             this_is_recusive_function_for_remove_all_lossAmount(
               total_value_bet_amount_which_is_grater_than_lossAmount
             );
-           
+
             thisFunctonMustBePerFormAfterCrash(
               Number(`${seconds + 1}.${milliseconds}`)
             );
@@ -642,7 +643,6 @@ async function generateAndSendMessage(data) {
       }
     }
 
-   
     ///////////////////////////////////// thsi is the calculation of total cashout sum
     const total_amount_ka_60_percent = bet_sum * (60 / 100); /// 60 percent se upar jayega to crash kra dena hai
 
@@ -664,7 +664,7 @@ async function generateAndSendMessage(data) {
       clearInterval(crashInterval);
       clearInterval(timerInterval);
       clearInterval(crashInterval);
-     
+
       counterboolean = false;
       ///////////////// this is the condition that means if cashout is grater than //////////////////////
       if (cash_out_sum > bet_sum) {
@@ -674,7 +674,7 @@ async function generateAndSendMessage(data) {
         const response = await obj.save();
         // await CashOut.deleteMany({});
       }
-      
+
       thisFunctonMustBePerFormAfterCrash(
         Number(`${seconds + 1}.${milliseconds}`)
       );
@@ -720,7 +720,7 @@ async function generateAndSendMessage(data) {
       clearInterval(crashInterval);
       clearInterval(timerInterval);
       clearInterval(crashInterval);
-      
+
       const remaining_amount =
         find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount - bet_sum;
       if (
@@ -735,7 +735,7 @@ async function generateAndSendMessage(data) {
               bet_sum,
           }
         );
-       
+
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
@@ -787,7 +787,7 @@ async function generateAndSendMessage(data) {
         clearInterval(crashInterval);
         clearInterval(timerInterval);
         clearInterval(crashInterval);
-        
+
         await LossTable.findByIdAndUpdate(
           { _id: find_any_loss_amount_match_with_60_percent?.[0]?._id },
           {
@@ -796,7 +796,7 @@ async function generateAndSendMessage(data) {
               bet_sum,
           }
         );
-       
+
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds + 1}.${milliseconds}`)
         );
@@ -818,6 +818,7 @@ async function generateAndSendMessage(data) {
   }
 
   async function thisFunctonMustBePerFormAfterCrash(time) {
+    bet_data = []
     clearInterval(timerInterval);
     clearInterval(crashInterval);
     clearInterval(timerInterval);
@@ -860,33 +861,68 @@ async function generateAndSendMessage(data) {
   }
 }
 
+////////////// testing api's ////////////////////////
+app.post("/api/v1/apply-bet", async (req, res) => {
+  try {
+    const { userid, id, amount } = req.body;
+    if (!userid || !id || !amount)
+      return res.status(403).json({
+        msg: "All field is required",
+      });
+    const new_data = {
+      userid: userid,
+      id: id,
+      amount: amount,
+    };
+    bet_data.push(new_data);
+    const user = await User.findOne({ _id: userid });
+    const newamount = await User.findByIdAndUpdate(
+      { _id: userid },
+      { wallet: user.wallet - amount }
+    );
+    return res.status(200).json({
+      msg: "Data save successfully",
+      newamount: newamount,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      msg: "Something went wrong in bet placing",
+    });
+  }
+});
 
+app.post("/api/v1/cash-out", async (req, res) => {
+  try {
+    const { userid, id, amount, multiplier } = req.body;
+    if (!userid || !id || !amount || !multiplier)
+      return res.status(403).json({
+        msg: "All field is required",
+      });
 
+    const user = await User.findOne({ _id: userid });
+    const newamount = await User.findByIdAndUpdate(
+      { _id: userid },
+      { wallet: user.wallet + amount }
+    );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    bet_data.forEach((item) => {
+      if (item.id === id) {
+        item.amount += amount;
+      }
+    });
+    ////////////////// revert the final response
+    return res.status(200).json({
+      msg: "Data save successfully",
+      newamount: newamount,
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      msg: "Something went wrong in create user query",
+    });
+  }
+});
 
 //////////////////////  ledger entry to be transfer into sql database /////////////////////////////////
 
