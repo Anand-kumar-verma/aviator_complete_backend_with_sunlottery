@@ -421,7 +421,7 @@ async function table_generateround() {
 }
 table_generateround();
 
-async function generateAndSendMessage(data) {
+async function generateAndSendMessage(data,loss_amount) {
   if (data === "no") return;
   // const round = await GameRound?.find({});
 
@@ -476,7 +476,7 @@ async function generateAndSendMessage(data) {
 
   ///////////////////////////////////// thsi is the calculation of total cashout sum
   let bet_sum = 0;
-  let loss_amount = 0;
+  // let loss_amount = 0;
   let get_counter = 0;
   crashInterval = setInterval(async () => {
     // const set_counter = await SetCounter.find({});
@@ -510,19 +510,21 @@ async function generateAndSendMessage(data) {
     /////////////////// condition for loss amount //////////////////////////
 
     if (loss_amount !== 0 && bet_sum !== 0) {
-      if (get_counter >= 3) {
-        clearInterval(timerInterval);
-        clearInterval(crashInterval);
-        clearInterval(timerInterval);
-        clearInterval(crashInterval);
 
-        this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
-          bet_sum
-        );
-        thisFunctonMustBePerFormAfterCrash(
-          Number(`${seconds + 1}.${milliseconds}`)
-        );
-      }
+      // if (get_counter >= 3) {
+      //   clearInterval(timerInterval);
+      //   clearInterval(crashInterval);
+      //   clearInterval(timerInterval);
+      //   clearInterval(crashInterval);
+
+      //   this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
+      //     bet_sum
+      //   );
+      //   thisFunctonMustBePerFormAfterCrash(
+      //     Number(`${seconds + 1}.${milliseconds}`)
+      //   );
+      // }
+
       if (loss_amount <= bet_sum) {
         counterboolean = false;
         clearInterval(timerInterval);
@@ -840,10 +842,20 @@ async function generateAndSendMessage(data) {
       io.emit("setcolorofdigit", false);
       io.emit("setloder", true);
     }, 3000);
+   let loss_amount = await LossTable.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$lossAmount" },
+        },
+      },
+    ]).then((result) => {
+      return result.length > 0 ? result[0].totalAmount : 0;
+    });
 
     setTimeout(() => {
       bet_data = [];
-      generateAndSendMessage("yes");
+      generateAndSendMessage("yes",loss_amount);
     }, 30000);
   }
 }
