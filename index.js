@@ -409,7 +409,7 @@ async function table_generateround() {
   // });
 
   if (x) {
-    // generateAndSendMessage("yes");
+    generateAndSendMessage("yes");
 
     console.log("Waiting for the next minute to start...");
     const now = new Date();
@@ -890,7 +890,7 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
 
     setTimeout(() => {
       bet_data = [];
-      // generateAndSendMessage("yes", loss_amount,get_counter);
+      generateAndSendMessage("yes", loss_amount,get_counter);
     }, 30000);
   }
 }
