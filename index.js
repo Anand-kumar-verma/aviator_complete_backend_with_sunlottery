@@ -416,7 +416,7 @@ async function table_generateround() {
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     setTimeout(() => {
-      generateAndSendMessage("yes");
+      // generateAndSendMessage("yes");
       x = false;
     }, secondsUntilNextMinute * 1000);
   }
@@ -906,12 +906,40 @@ async function generateAndSendMessage(data) {
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //////////////////////  ledger entry to be transfer into sql database /////////////////////////////////
 
 // aviator band huaa 12 bje
 schedule.scheduleJob("0 0 * * *", async function () {
   // generateAndSendMessage("no");
-  start_aviator_closing();
+  // start_aviator_closing();
 });
 // aviator start huaa 1 bje fir se
 schedule.scheduleJob("0 1 * * *", async function () {
