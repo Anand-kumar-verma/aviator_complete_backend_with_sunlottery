@@ -796,16 +796,18 @@ async function generateAndSendMessage(data) {
     clearInterval(crashInterval);
     console.log("thisFunctonMustBePerFormAfterCrash HOOOOOOO crached");
     // const round = await GameRound?.find({});
-    // const obj = new GameHistory({
-    //   round: round?.[0]?.round,
-    //   multiplier: time,
-    // });
-    // const response = await obj.save();
     io.emit("crash", true);
     io.emit("isFlying", false);
     io.emit("setcolorofdigit", true);
     io.emit("apply_bet_counter", []);
     io.emit("cash_out_counter", []);
+    
+    const obj = new GameHistory({
+      round: 10000,
+      multiplier: time,
+    });
+    const response = await obj.save();
+   
 
     if (msg === "sixty_percent_se_jyada_ka_crash") {
       const bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
