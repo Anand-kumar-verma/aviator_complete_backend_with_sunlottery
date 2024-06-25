@@ -812,7 +812,7 @@ async function generateAndSendMessage(data) {
       const cash_out_sum = bet_data?.reduce((a, b) => a + b?.amountcashed, 0);
       const obj = new LossTable({
         lossAmount: cash_out_sum - bet_sum,
-      });p
+      });
       const response = await obj.save();
     }
     if (msg === "remove_all_loss_and_set_counter_to_zero") {
