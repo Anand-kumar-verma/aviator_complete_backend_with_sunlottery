@@ -12,6 +12,7 @@ const LossTable = require("./models/LossTable");
 const ApplyBetLedger = require("./models/ApplyBetLedger");
 const User = require("./models/User");
 const AdminWallet = require("./models/AdminWallet");
+const GameHistory = require("./models/GameHistory");
 require("./config/database").connect();
 
 // const io = new Server(httpServer, {
@@ -408,7 +409,7 @@ async function table_generateround() {
   // });
 
   if (x) {
-    generateAndSendMessage("yes");
+    // generateAndSendMessage("yes");
 
     console.log("Waiting for the next minute to start...");
     const now = new Date();
@@ -801,11 +802,7 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
     io.emit("apply_bet_counter", []);
     io.emit("cash_out_counter", []);
 
-    // const obj = new GameHistory({
-    //   round: 10000,
-    //   multiplier: time,
-    // });
-    // const response = await obj.save();
+  
 
      if(msg === "counter_jyada_ho_chuka_hai"){
       let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
@@ -854,6 +851,12 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
       await SetCounter.findOneAndUpdate({}, { counter: 0 });
     }
 
+    const obj = new GameHistory({
+      round: 10000,
+      multiplier: time,
+    });
+    const response = await obj.save();
+
     // copy all bet into ledger
     const applyBet_data = await applyBet.find();
     for (const entry of applyBet_data) {
@@ -887,7 +890,7 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
 
     setTimeout(() => {
       bet_data = [];
-      generateAndSendMessage("yes", loss_amount,get_counter);
+      // generateAndSendMessage("yes", loss_amount,get_counter);
     }, 30000);
   }
 }
