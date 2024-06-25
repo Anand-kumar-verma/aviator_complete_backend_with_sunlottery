@@ -422,7 +422,7 @@ async function table_generateround() {
 }
 table_generateround();
 
-async function generateAndSendMessage(data, loss_amount,get_counter) {
+async function generateAndSendMessage(data, loss_amount, get_counter) {
   if (data === "no") return;
   // const round = await GameRound?.find({});
 
@@ -466,7 +466,8 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
       clearInterval(timerInterval);
       clearInterval(crashInterval);
       thisFunctonMustBePerFormAfterCrash(
-        Number(`${seconds + 1}.${milliseconds}`),"pre"
+        Number(`${seconds + 1}.${milliseconds}`),
+        "pre"
       );
       return;
     }
@@ -519,7 +520,8 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
         //   bet_sum
         // );
         thisFunctonMustBePerFormAfterCrash(
-          Number(`${seconds + 1}.${milliseconds}`),"counter_jyada_ho_chuka_hai"
+          Number(`${seconds + 1}.${milliseconds}`),
+          "counter_jyada_ho_chuka_hai"
         );
       }
 
@@ -802,19 +804,17 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
     io.emit("apply_bet_counter", []);
     io.emit("cash_out_counter", []);
 
-  
-
-     if(msg === "counter_jyada_ho_chuka_hai"){
+    if (msg === "counter_jyada_ho_chuka_hai") {
       let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
       this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
         bet_sum
       );
-     }
+    }
     if (
       msg ===
       "loss_if_loss_jyada_hai_bet_amount_se_aur_60_percent_se_koi_match_bhi_kiya_hai"
     ) {
-     let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
+      let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
       await LossTable.findByIdAndUpdate(
         { _id: find_any_loss_amount_match_with_60_percent?.[0]?._id },
         {
@@ -853,7 +853,7 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
 
     const obj = new GameHistory({
       round: 10000,
-      multiplier: msg ==="pre" ? time : time - .01,
+      multiplier: msg === "pre" ? time : time - 0.01,
     });
     const response = await obj.save();
 
@@ -885,12 +885,39 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
     ]).then((result) => {
       return result.length > 0 ? result[0].totalAmount : 0;
     });
-     const set_counter = await SetCounter.find({});
-   let get_counter = set_counter?.[0]?.counter || 0;
+    const set_counter = await SetCounter.find({});
+    let get_counter = set_counter?.[0]?.counter || 0;
+
+    const total_bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
+    const total_crashed_sum = bet_data?.reduce((a, b) => a + b.amountcashed, 0);
+    const admin_wallet = await AdminWallet.find({}).limit(1);
+    await AdminWallet.findByIdAndUpdate(
+      { _id: admin_wallet?.[0]?._id },
+      {
+        wallet:
+          admin_wallet?.[0]?.wallet +
+          (Number(total_bet_sum) - Number(total_crashed_sum)),
+      }
+    );
+    bet_data.forEach(async (element) => {
+      const getuser = await User.findOne({ _id: element.userid });
+      const response = await User.findByIdAndUpdate(
+        { _id: getuser._id },
+        {
+          wallet:
+            getuser.wallet +
+            Number(
+              element.amountcashed > 0
+                ? element.amountcashed - element.amount
+                : -element.amount
+            ),
+        }
+      )
+    });
 
     setTimeout(() => {
       bet_data = [];
-      generateAndSendMessage("yes", loss_amount,get_counter);
+      generateAndSendMessage("yes", loss_amount, get_counter);
     }, 30000);
   }
 }
