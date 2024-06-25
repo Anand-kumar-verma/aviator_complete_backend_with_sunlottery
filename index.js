@@ -6,11 +6,9 @@ require("dotenv").config();
 const schedule = require("node-schedule");
 const axios = require("axios");
 const mysql = require("mysql");
-const GameRound = require("./models/GameRound");
 const SetCounter = require("./models/SetCounter");
 const applyBet = require("./models/applyBet");
 const LossTable = require("./models/LossTable");
-const GameHistory = require("./models/GameHistory");
 const ApplyBetLedger = require("./models/ApplyBetLedger");
 const User = require("./models/User");
 const AdminWallet = require("./models/AdminWallet");
@@ -481,8 +479,8 @@ async function generateAndSendMessage(data) {
   let loss_amount = 0;
   let get_counter = 0;
   crashInterval = setInterval(async () => {
-    const set_counter = await SetCounter.find({});
-    get_counter = set_counter?.[0]?.counter || 0;
+    // const set_counter = await SetCounter.find({});
+    // get_counter = set_counter?.[0]?.counter || 0;
 
     //////////////////////get counter         ////////////////////////////////////////////
 
@@ -531,10 +529,9 @@ async function generateAndSendMessage(data) {
         clearInterval(crashInterval);
         clearInterval(timerInterval);
         clearInterval(crashInterval);
-        await LossTable.deleteMany({});
-        await SetCounter.findOneAndUpdate({}, { counter: 0 });
         thisFunctonMustBePerFormAfterCrash(
-          Number(`${seconds + 1}.${milliseconds}`)
+          Number(`${seconds + 1}.${milliseconds}`),
+          "remove_all_loss_and_set_counter_to_zero"
         );
         return;
       } else {
@@ -815,8 +812,12 @@ async function generateAndSendMessage(data) {
       const cash_out_sum = bet_data?.reduce((a, b) => a + b?.amountcashed, 0);
       const obj = new LossTable({
         lossAmount: cash_out_sum - bet_sum,
-      });
+      });p
       const response = await obj.save();
+    }
+    if (msg === "remove_all_loss_and_set_counter_to_zero") {
+      await LossTable.deleteMany({});
+      await SetCounter.findOneAndUpdate({}, { counter: 0 });
     }
 
     // copy all bet into ledger
@@ -840,8 +841,8 @@ async function generateAndSendMessage(data) {
 
     setTimeout(() => {
       bet_data = [];
-      generateAndSendMessage("yes");
-    }, 20000);
+      // generateAndSendMessage("yes");
+    }, 30000);
   }
 }
 
