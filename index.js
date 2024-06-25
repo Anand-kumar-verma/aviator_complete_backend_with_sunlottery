@@ -875,14 +875,8 @@ app.post("/api/v1/apply-bet", async (req, res) => {
       amount: amount,
     };
     bet_data.push(new_data);
-    const user = await User.findOne({ _id: userid });
-    const newamount = await User.findByIdAndUpdate(
-      { _id: userid },
-      { wallet: user.wallet - amount }
-    );
     return res.status(200).json({
       msg: "Data save successfully",
-      newamount: newamount,
     });
   } catch (e) {
     console.log(e);
@@ -899,13 +893,6 @@ app.post("/api/v1/cash-out", async (req, res) => {
       return res.status(403).json({
         msg: "All field is required",
       });
-
-    const user = await User.findOne({ _id: userid });
-    const newamount = await User.findByIdAndUpdate(
-      { _id: userid },
-      { wallet: user.wallet + amount }
-    );
-
     bet_data.forEach((item) => {
       if (item.id === id) {
         item.amount += amount;
