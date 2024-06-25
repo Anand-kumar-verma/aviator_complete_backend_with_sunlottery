@@ -409,7 +409,7 @@ async function table_generateround() {
   // });
 
   if (x) {
-    // generateAndSendMessage("yes");
+    generateAndSendMessage("yes");
 
     console.log("Waiting for the next minute to start...");
     const now = new Date();
@@ -466,7 +466,7 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
       clearInterval(timerInterval);
       clearInterval(crashInterval);
       thisFunctonMustBePerFormAfterCrash(
-        Number(`${seconds + 1}.${milliseconds}`)
+        Number(`${seconds + 1}.${milliseconds}`),"pre"
       );
       return;
     }
@@ -853,7 +853,7 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
 
     const obj = new GameHistory({
       round: 10000,
-      multiplier: time,
+      multiplier: msg ==="pre" ? time : time - .01,
     });
     const response = await obj.save();
 
@@ -890,7 +890,7 @@ async function generateAndSendMessage(data, loss_amount,get_counter) {
 
     setTimeout(() => {
       bet_data = [];
-      // generateAndSendMessage("yes", loss_amount,get_counter);
+      generateAndSendMessage("yes", loss_amount,get_counter);
     }, 30000);
   }
 }
