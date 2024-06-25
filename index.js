@@ -414,7 +414,7 @@ async function table_generateround() {
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     setTimeout(() => {
-      // generateAndSendMessage("yes");
+      generateAndSendMessage("yes");
       x = false;
     }, secondsUntilNextMinute * 1000);
   }
@@ -841,7 +841,7 @@ async function generateAndSendMessage(data) {
 
     setTimeout(() => {
       bet_data = [];
-      // generateAndSendMessage("yes");
+      generateAndSendMessage("yes");
     }, 30000);
   }
 }
