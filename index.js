@@ -410,7 +410,7 @@ async function table_generateround() {
   });
 
   if (x) {
-    // generateAndSendMessage("yes");
+    generateAndSendMessage("yes");
 
     console.log("Waiting for the next minute to start...");
     const now = new Date();
