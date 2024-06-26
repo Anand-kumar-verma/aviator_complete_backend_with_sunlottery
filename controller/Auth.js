@@ -2,7 +2,6 @@ const { io } = require("../config/socket");
 const AdminWallet = require("../models/AdminWallet");
 const ApplyBetLedger = require("../models/ApplyBetLedger");
 const GameHistory = require("../models/GameHistory");
-const GameRound = require("../models/GameRound");
 const LossTable = require("../models/LossTable");
 const User = require("../models/User");
 const applyBet = require("../models/applyBet");
@@ -39,94 +38,94 @@ exports.createUser = async (req, res) => {
   }
 };
 
-exports.applybetFunction = async (req, res) => {
-  try {
-    const { userid, id, amount } = req.body;
-    if (!userid || !id || !amount)
-      return res.status(403).json({
-        msg: "All field is required",
-      });
+// exports.applybetFunction = async (req, res) => {
+//   try {
+//     const { userid, id, amount } = req.body;
+//     if (!userid || !id || !amount)
+//       return res.status(403).json({
+//         msg: "All field is required",
+//       });
 
-    const round = await GameRound?.find({});
-    const obj = new applyBet({
-      userid: String(id),
-      amount,
-      round: round?.[0]?.round,
-    });
-    const user = await User.findOne({ _id: userid });
-    const newamount = await User.findByIdAndUpdate(
-      { _id: userid },
-      { wallet: user.wallet - amount }
-    );
-    const response = await obj.save();
-    io.emit("apply_bet_counter",response)
-    ///////// update admin wallet //////////////////////////////////
-    const admin_wallet = await AdminWallet.find({});
-    const firstElement = admin_wallet?.[0];
-    await AdminWallet.findByIdAndUpdate(
-      { _id: firstElement._id },
-      { wallet: Number(firstElement.wallet || 0) + Number(amount || 0) }
-    );
+//     const round = await GameRound?.find({});
+//     const obj = new applyBet({
+//       userid: String(id),
+//       amount,
+//       round: round?.[0]?.round,
+//     });
+//     const user = await User.findOne({ _id: userid });
+//     const newamount = await User.findByIdAndUpdate(
+//       { _id: userid },
+//       { wallet: user.wallet - amount }
+//     );
+//     const response = await obj.save();
+//     io.emit("apply_bet_counter",response)
+//     ///////// update admin wallet //////////////////////////////////
+//     const admin_wallet = await AdminWallet.find({});
+//     const firstElement = admin_wallet?.[0];
+//     await AdminWallet.findByIdAndUpdate(
+//       { _id: firstElement._id },
+//       { wallet: Number(firstElement.wallet || 0) + Number(amount || 0) }
+//     );
 
-    ////////////////// revert the final response
-    return res.status(200).json({
-      msg: "Data save successfully",
-      data: response,
-      newamount: newamount,
-    });
-  } catch (e) {
-    res.status(500).json({
-      msg: "Something went wrong in create user query",
-    });
-  }
-};
+//     ////////////////// revert the final response
+//     return res.status(200).json({
+//       msg: "Data save successfully",
+//       data: response,
+//       newamount: newamount,
+//     });
+//   } catch (e) {
+//     res.status(500).json({
+//       msg: "Something went wrong in create user query",
+//     });
+//   }
+// };
 
-exports.cashOutFunction = async (req, res) => {
-  try {
-    const { userid, id, amount, multiplier } = req.body;
-    if (!userid || !id || !amount || !multiplier)
-      return res.status(403).json({
-        msg: "All field is required",
-      });
+// exports.cashOutFunction = async (req, res) => {
+//   try {
+//     const { userid, id, amount, multiplier } = req.body;
+//     if (!userid || !id || !amount || !multiplier)
+//       return res.status(403).json({
+//         msg: "All field is required",
+//       });
 
-    const round = await GameRound?.find({});
-    // const obj = new applyBet({
-    //   userid,
-    //   amount,
-    //   multiplier,
-    // });
-    const user = await User.findOne({ _id: userid });
-    const newamount = await User.findByIdAndUpdate(
-      { _id: userid },
-      { wallet: user.wallet + amount }
-    );
-    const response = await applyBet.findOneAndUpdate(
-      { userid: id, round: round?.[0]?.round },
-      { amountcashed: amount, multiplier: multiplier }
-    );
-    io.emit("cash_out_counter",response)
-    // const response = await obj.save();
-    ///////// update admin wallet //////////////////////////////////
-    const admin_wallet = await AdminWallet.find({});
-    const firstElement = admin_wallet?.[0];
-    await AdminWallet.findByIdAndUpdate(
-      { _id: firstElement._id },
-      { wallet: Number(firstElement.wallet || 0) - Number(amount || 0) }
-    );
+//     const round = await GameRound?.find({});
+//     // const obj = new applyBet({
+//     //   userid,
+//     //   amount,
+//     //   multiplier,
+//     // });
+//     const user = await User.findOne({ _id: userid });
+//     const newamount = await User.findByIdAndUpdate(
+//       { _id: userid },
+//       { wallet: user.wallet + amount }
+//     );
+//     const response = await applyBet.findOneAndUpdate(
+//       { userid: id, round: round?.[0]?.round },
+//       { amountcashed: amount, multiplier: multiplier }
+//     );
+//     io.emit("cash_out_counter",response)
+//     // const response = await obj.save();
+//     ///////// update admin wallet //////////////////////////////////
+//     const admin_wallet = await AdminWallet.find({});
+//     const firstElement = admin_wallet?.[0];
+//     await AdminWallet.findByIdAndUpdate(
+//       { _id: firstElement._id },
+//       { wallet: Number(firstElement.wallet || 0) - Number(amount || 0) }
+//     );
 
-    ////////////////// revert the final response
-    return res.status(200).json({
-      msg: "Data save successfully",
-      data: response,
-      newamount: newamount,
-    });
-  } catch (e) {
-    console.log(e);
-    return res.status(500).json({
-      msg: "Something went wrong in create user query",
-    });
-  }
-};
+//     ////////////////// revert the final response
+//     return res.status(200).json({
+//       msg: "Data save successfully",
+//       data: response,
+//       newamount: newamount,
+//     });
+//   } catch (e) {
+//     console.log(e);
+//     return res.status(500).json({
+//       msg: "Something went wrong in create user query",
+//     });
+//   }
+// };
 
 exports.adminWalletFunction = async (req, res) => {
   try {
