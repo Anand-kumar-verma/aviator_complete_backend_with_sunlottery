@@ -409,7 +409,7 @@ async function table_generateround() {
   // });
 
   if (x) {
-    generateAndSendMessage("yes");
+    // generateAndSendMessage("yes");
 
     console.log("Waiting for the next minute to start...");
     const now = new Date();
@@ -857,19 +857,15 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     });
     const response = await obj.save();
 
-    // copy all bet into ledger
-    const applyBet_data = await applyBet.find();
-    for (const entry of applyBet_data) {
-      // Create a copy of the entry object without the _id field
-      const { _id, ...entryWithoutId } = entry.toObject();
-
-      // Create a new ApplyBetLedger object without the _id
-      const newEntry = new ApplyBetLedger(entryWithoutId);
-
-      // Save the new entry
-      await newEntry.save();
-    }
-    await applyBet.deleteMany({});
+    bet_data.forEach(async (element) => {
+      const obj = new ApplyBetLedger({
+        userid: element.id,
+        amount: element.amount,
+        amountcashed: element.amountcashed,
+        multiplier: element.multiplier,
+      });
+      await obj.save();
+    });
 
     setTimeout(() => {
       io.emit("setcolorofdigit", false);
@@ -912,12 +908,12 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
                 : -element.amount
             ),
         }
-      )
+      );
     });
 
     setTimeout(() => {
       bet_data = [];
-      generateAndSendMessage("yes", loss_amount, get_counter);
+      // generateAndSendMessage("yes", loss_amount, get_counter);
     }, 30000);
   }
 }

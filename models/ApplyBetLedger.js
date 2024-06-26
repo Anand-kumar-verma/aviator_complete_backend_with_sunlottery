@@ -5,10 +5,6 @@ const applybetSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    round: {
-      type: Number,
-      default: 0,
-    },
     amount: {
       type: Number,
       default: 0,
