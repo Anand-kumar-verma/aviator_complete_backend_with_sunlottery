@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 const applybetSchema = new mongoose.Schema(
   {
+    main_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user"
+    },
     userid: {
       type: String,
       required: true,

@@ -291,3 +291,20 @@ exports.getAviatorWalletAmountAdmin = async (req, res) => {
     console.log(e);
   }
 };
+
+exports.getLederData = async (req, res) => {
+  try {
+
+    const data = await ApplyBetLedger.find({}).populate("main_id").limit(100);
+    if (!data)
+      return res.status(400).json({
+        msg: "Data not found",
+      });
+    return res.status(200).json({
+      data: data,
+      msg: "Data fetched successfully",
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};

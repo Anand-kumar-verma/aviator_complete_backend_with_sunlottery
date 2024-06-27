@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 // const { loginFun, dashboardCounter, getAllAttendanceList, deleteAttendanceById, updateAttendanceById, getAllPlayer, updatePlayerRecord, updatePlayerStatus, addPlayer, getUserByRedId, getUserDataById, changePassword, withdrawlRequestFun, withdrawlApprovedFun, withdrawlRejectFun, withdrlApprovedFilterFun, withdrlRejectFilterFun, addSubAdmin, getSubAdminList, getAllAssignedMenu, shwoMenu, viewAllAsignedMenu, getSubMenu, addAttendance, addFund, getAllDirectReferralByUserId, getAllDownLineByUserId, depositRequestFilterCricket, depositRequestFilterWingo, withdrawlRequestReportCricket, withdrawlRequestReportWingo, colorPredictionOneMin, colorPredictionOneMinGetNextId, manuallyWinning, manuallyupdatePercentage, getFundHistory } = require("../controller/Aviator/login");
-const { createUser, applybetFunction, cashOutFunction, adminWalletFunction, userLoginFunctoin, lossAmountFunction, getWalletByUserId, getGameHistory, getMyHistoryByID, getAviatorWalletAmountAdmin } = require("../controller/Auth");
+const { createUser, applybetFunction, cashOutFunction, adminWalletFunction, userLoginFunctoin, lossAmountFunction, getWalletByUserId, getGameHistory, getMyHistoryByID, getAviatorWalletAmountAdmin, getLederData } = require("../controller/Auth");
 
 
 
@@ -55,6 +55,7 @@ router.post("/get-wallet-amount-by-id", getWalletByUserId);
 router.get("/get-game-history", getGameHistory);
 router.post("/my-history-by-user-id", getMyHistoryByID);
 router.get("/current-aviator-admin-wallet-amount", getAviatorWalletAmountAdmin);
+router.get("/get-ledger-data", getLederData);
 
 
 module.exports = router;
