@@ -732,10 +732,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
         },
       ]);
     // this is the base case..
-    console.log("find_any_loss_amount_match_with_60_percent",find_any_loss_amount_match_with_60_percent)
     if (!find_any_loss_amount_match_with_60_percent || find_any_loss_amount_match_with_60_percent?.length <= 0) {
-      console.log("Anand ji ka function call huaa inside if")
-
       await SetCounter.findOneAndUpdate({}, { counter: 0 });
       return;
     }
