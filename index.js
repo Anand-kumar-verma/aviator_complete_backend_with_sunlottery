@@ -488,14 +488,14 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     /// calculation for apply all bets summesion////////////////////////////
 
     ///////////////////////////////
-    if (bet_sum <= 0) {
-      bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
-      total_bet_candidate = bet_data?.length;
-    }
+    bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
+    total_bet_candidate = bet_data?.length;
 
     const cash_out_sum = bet_data?.reduce((a, b) => a + b?.amountcashed, 0);
     const total_amount_ka_60_percent = bet_sum * (60 / 100); /// 60 percent se upar jayega to crash kra dena hai
 
+
+    console.log(cash_out_sum,total_amount_ka_60_percent,cash_out_sum > total_amount_ka_60_percent)
     /////////////////// condition for loss amount //////////////////////////
 
     if (loss_amount !== 0 && bet_sum !== 0) {
@@ -512,9 +512,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
           "counter_jyada_ho_chuka_hai"
         );
         return;
-      }
-
-    else  if (loss_amount <= bet_sum) {
+      } else if (loss_amount <= bet_sum) {
         counterboolean = false;
         clearInterval(timerInterval);
         clearInterval(crashInterval);
@@ -609,7 +607,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     ///////////////////////////////////// thsi is the calculation of total cashout sum
 
     /////////// conditoin for that if total amount is grater or equal that 500 Rs. creash ////////////////////
-    else if (total_bet_candidate <= 5 && bet_sum >= 500) {
+     if (total_bet_candidate <= 5 && bet_sum >= 500) {
       clearInterval(timerInterval);
       clearInterval(crashInterval);
       clearInterval(timerInterval);
@@ -620,8 +618,8 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
       return;
     }
     ////////////////////// conndition is that means agar cashout 60% se jyada huaa to crash kra do///////////////
-
-   else if (cash_out_sum > total_amount_ka_60_percent) {
+     if (cash_out_sum > total_amount_ka_60_percent) {
+      console.log("Function is called now 60 percent se jyada")
       clearInterval(timerInterval);
       clearInterval(crashInterval);
       clearInterval(timerInterval);
@@ -644,7 +642,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
       ///////////////// this is the condition that means if cashout is grater than //////////////////////
     }
     //////////////////// agar bet lgi hui hai to  second 4 se jyada nhi hone chahiye (+1 krna pdega hmesa q ki ui me +1 karke dikhaya gya hai each and everything)
-   else if (bet_sum > 0) {
+     if (bet_sum > 0) {
       if (Number(seconds >= 3)) {
         clearInterval(timerInterval);
         clearInterval(crashInterval);
@@ -718,10 +716,75 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     }
   }
 
+  // async function this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
+  //   bet_sum
+  // ) {
+  //   console.log("Anand ji ka function call huaa",bet_sum);
+  //   const find_any_loss_amount_match_with_60_percent =
+  //     await LossTable.aggregate([
+  //       {
+  //         $sort: { lossAmount: -1 }, // Sort by lossAmount in descending order
+  //       },
+  //       {
+  //         $limit: 1, // Limit the result to the first document
+  //       },
+  //     ]);
+  //   // this is the base case..
+  //   if (
+  //     !find_any_loss_amount_match_with_60_percent ||
+  //     find_any_loss_amount_match_with_60_percent?.length <= 0
+  //   ) {
+  //     await SetCounter.findOneAndUpdate({}, { counter: 0 });
+  //     return;
+  //   }
+  //   if (
+  //     find_any_loss_amount_match_with_60_percent?.[0] &&
+  //     find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount > bet_sum
+  //   ) {
+  //     const remaining_amount =
+  //       find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount - bet_sum;
+  //     if (
+  //       remaining_amount > 0 &&
+  //       find_any_loss_amount_match_with_60_percent?.[0]
+  //     ) {
+  //       clearInterval(timerInterval);
+  //       clearInterval(crashInterval);
+  //       clearInterval(timerInterval);
+  //       clearInterval(crashInterval);
+
+  //       await LossTable.findByIdAndUpdate(
+  //         { _id: find_any_loss_amount_match_with_60_percent?.[0]?._id },
+  //         {
+  //           lossAmount:
+  //             find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount -
+  //             bet_sum,
+  //         }
+  //       );
+
+  //       // thisFunctonMustBePerFormAfterCrash(
+  //       //   Number(`${seconds + 1}.${milliseconds}`)
+  //       // );
+  //       return;
+  //     }
+  //   } else {
+  //     if (find_any_loss_amount_match_with_60_percent?.[0]) {
+  //       await LossTable.findByIdAndDelete({
+  //         _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
+  //       });
+  //       const total_value_bet_amount_which_is_grater_than_lossAmount =
+  //         bet_sum - find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount;
+  //       if (total_value_bet_amount_which_is_grater_than_lossAmount > 0)
+  //         this_is_recusive_function_for_remove_all_lossAmount(
+  //           total_value_bet_amount_which_is_grater_than_lossAmount
+  //         );
+  //     }
+  //   }
+  // }
   async function this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
     bet_sum
   ) {
-    console.log("Anand ji ka function call huaa")
+    console.log("Anand ji ka function call huaa", bet_sum);
+  
     const find_any_loss_amount_match_with_60_percent =
       await LossTable.aggregate([
         {
@@ -731,59 +794,62 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
           $limit: 1, // Limit the result to the first document
         },
       ]);
+  
     // this is the base case..
-    if (!find_any_loss_amount_match_with_60_percent || find_any_loss_amount_match_with_60_percent?.length <= 0) {
+    if (
+      !find_any_loss_amount_match_with_60_percent ||
+      find_any_loss_amount_match_with_60_percent.length <= 0
+    ) {
       await SetCounter.findOneAndUpdate({}, { counter: 0 });
       return;
     }
+  
     if (
-      find_any_loss_amount_match_with_60_percent?.[0] &&
-      find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount > bet_sum
+      find_any_loss_amount_match_with_60_percent[0] &&
+      find_any_loss_amount_match_with_60_percent[0].lossAmount > bet_sum
     ) {
       const remaining_amount =
-        find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount - bet_sum;
-      if (
-        remaining_amount > 0 &&
-        find_any_loss_amount_match_with_60_percent?.[0]
-      ) {
+        find_any_loss_amount_match_with_60_percent[0].lossAmount - bet_sum;
+  
+      if (remaining_amount > 0) {
         clearInterval(timerInterval);
         clearInterval(crashInterval);
-        clearInterval(timerInterval);
-        clearInterval(crashInterval);
-
+  
         await LossTable.findByIdAndUpdate(
-          { _id: find_any_loss_amount_match_with_60_percent?.[0]?._id },
+          { _id: find_any_loss_amount_match_with_60_percent[0]._id },
           {
-            lossAmount:
-              find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount -
-              bet_sum,
+            lossAmount: remaining_amount,
           }
         );
-
-        // thisFunctonMustBePerFormAfterCrash(
-        //   Number(`${seconds + 1}.${milliseconds}`)
-        // );
+  
         return;
       }
     } else {
-      if (find_any_loss_amount_match_with_60_percent?.[0]) {
+      if (find_any_loss_amount_match_with_60_percent[0]) {
         await LossTable.findByIdAndDelete({
-          _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
+          _id: find_any_loss_amount_match_with_60_percent[0]._id,
         });
-        const total_value_bet_amount_which_is_grater_than_lossAmount =
-          bet_sum - find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount;
-        if (total_value_bet_amount_which_is_grater_than_lossAmount > 0)
-          this_is_recusive_function_for_remove_all_lossAmount(
-            total_value_bet_amount_which_is_grater_than_lossAmount
+  
+        const total_value_bet_amount_which_is_greater_than_lossAmount =
+          bet_sum - find_any_loss_amount_match_with_60_percent[0].lossAmount;
+  
+        if (total_value_bet_amount_which_is_greater_than_lossAmount > 0) {
+          return this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
+            total_value_bet_amount_which_is_greater_than_lossAmount
           );
+        }
       }
     }
+  
+    // Check if there are any remaining documents
+    const remaining_documents = await LossTable.find({}).countDocuments();
+    if (remaining_documents === 0) {
+      await SetCounter.findOneAndUpdate({}, { counter: 0 });
+    }
   }
+  
 
-  async function thisFunctonMustBePerFormAfterCrash(
-    time,
-    msg,
-  ) {
+  async function thisFunctonMustBePerFormAfterCrash(time, msg) {
     clearInterval(timerInterval);
     clearInterval(crashInterval);
     clearInterval(timerInterval);
@@ -799,6 +865,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     if (msg === "counter_jyada_ho_chuka_hai") {
       console.log("counter_jyada_ho_chuka_hai");
       let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
+      console.log(bet_sum,"tyhi si sssssssssssssssss");
       this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
         bet_sum
       );
@@ -807,7 +874,9 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
       msg ===
       "loss_if_loss_jyada_hai_bet_amount_se_aur_60_percent_se_koi_match_bhi_kiya_hai"
     ) {
-      console.log("loss_if_loss_jyada_hai_bet_amount_se_aur_60_percent_se_koi_match_bhi_kiya_hai")
+      console.log(
+        "loss_if_loss_jyada_hai_bet_amount_se_aur_60_percent_se_koi_match_bhi_kiya_hai"
+      );
       let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
       const find_any_loss_amount_match_with_60_percent =
         await LossTable.aggregate([
@@ -833,7 +902,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     }
 
     if (msg === "recursive_functoin_for_all_removel_amount") {
-      console.log("recursive_functoin_for_all_removel_amount")
+      console.log("recursive_functoin_for_all_removel_amount");
       let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
       const percent_60_bet_amount = bet_sum * (100 / 60);
       const find_any_loss_amount_match_with_60_percent =
@@ -861,7 +930,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     }
 
     if (msg === "sixty_percent_se_jyada_ka_crash") {
-      console.log("sixty_percent_se_jyada_ka_crash")
+      console.log("sixty_percent_se_jyada_ka_crash");
       const bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
       const cash_out_sum = bet_data?.reduce((a, b) => a + b?.amountcashed, 0);
       const obj = new LossTable({
