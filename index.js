@@ -870,6 +870,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     ) {
      
       let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
+      const percent_60_bet_amount = bet_sum * (100 / 60);
       const find_any_loss_amount_match_with_60_percent =
         await LossTable.aggregate([
           {
