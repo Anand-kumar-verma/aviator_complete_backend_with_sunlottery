@@ -441,7 +441,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
   io.emit("message", time);
   io.emit("crash", false);
   let fly_time = 0;
-  let milliseconds = 0;
+  let milliseconds = 90;
   let seconds = 0;
 
   io.emit("setloder", false);
@@ -466,7 +466,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
       clearInterval(timerInterval);
       clearInterval(crashInterval);
       thisFunctonMustBePerFormAfterCrash(
-        Number(`${seconds + 1}.${milliseconds}`),
+        Number(`${seconds}.${milliseconds}`),
         "pre"
       );
       return;
@@ -507,7 +507,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
         //   bet_sum
         // );
         thisFunctonMustBePerFormAfterCrash(
-          Number(`${seconds + 1}.${milliseconds}`),
+          Number(`${seconds}.${milliseconds}`),
           "counter_jyada_ho_chuka_hai"
         );
         return;
@@ -518,7 +518,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
         clearInterval(timerInterval);
         clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
-          Number(`${seconds + 1}.${milliseconds}`),
+          Number(`${seconds}.${milliseconds}`),
           "remove_all_loss_and_set_counter_to_zero"
         );
         return;
@@ -554,7 +554,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
             find_any_loss_amount_match_with_60_percent?.[0]
           ) {
             thisFunctonMustBePerFormAfterCrash(
-              Number(`${seconds + 1}.${milliseconds}`),
+              Number(`${seconds}.${milliseconds}`),
               "loss_if_loss_jyada_hai_bet_amount_se_aur_60_percent_se_koi_match_bhi_kiya_hai",
               find_any_loss_amount_match_with_60_percent
             );
@@ -582,7 +582,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
            
 
             thisFunctonMustBePerFormAfterCrash(
-              Number(`${seconds + 1}.${milliseconds}`),
+              Number(`${seconds}.${milliseconds}`),
               "recursive_functoin_for_all_removel_amount"
             );
             return;
@@ -609,7 +609,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
       clearInterval(timerInterval);
       clearInterval(crashInterval);
       thisFunctonMustBePerFormAfterCrash(
-        Number(`${seconds + 1}.${milliseconds}`)
+        Number(`${seconds}.${milliseconds}`)
       );
       return;
     }
@@ -624,13 +624,13 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
       ///////////////// this is the condition that means if cashout is grater than //////////////////////
       if (cash_out_sum > bet_sum) {
         thisFunctonMustBePerFormAfterCrash(
-          Number(`${seconds + 1}.${milliseconds}`),
+          Number(`${seconds}.${milliseconds}`),
           "sixty_percent_se_jyada_ka_crash"
         );
         return;
       } else {
         thisFunctonMustBePerFormAfterCrash(
-          Number(`${seconds + 1}.${milliseconds}`),
+          Number(`${seconds}.${milliseconds}`),
           "null"
         );
         return;
@@ -645,7 +645,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
         clearInterval(timerInterval);
         clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
-          Number(`${seconds + 1}.${milliseconds}`)
+          Number(`${seconds}.${milliseconds}`)
         );
         return;
       }
@@ -712,70 +712,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     }
   }
 
-  // async function this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
-  //   bet_sum
-  // ) {
-  //   console.log("Anand ji ka function call huaa",bet_sum);
-  //   const find_any_loss_amount_match_with_60_percent =
-  //     await LossTable.aggregate([
-  //       {
-  //         $sort: { lossAmount: -1 }, // Sort by lossAmount in descending order
-  //       },
-  //       {
-  //         $limit: 1, // Limit the result to the first document
-  //       },
-  //     ]);
-  //   // this is the base case..
-  //   if (
-  //     !find_any_loss_amount_match_with_60_percent ||
-  //     find_any_loss_amount_match_with_60_percent?.length <= 0
-  //   ) {
-  //     await SetCounter.findOneAndUpdate({}, { counter: 0 });
-  //     return;
-  //   }
-  //   if (
-  //     find_any_loss_amount_match_with_60_percent?.[0] &&
-  //     find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount > bet_sum
-  //   ) {
-  //     const remaining_amount =
-  //       find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount - bet_sum;
-  //     if (
-  //       remaining_amount > 0 &&
-  //       find_any_loss_amount_match_with_60_percent?.[0]
-  //     ) {
-  //       clearInterval(timerInterval);
-  //       clearInterval(crashInterval);
-  //       clearInterval(timerInterval);
-  //       clearInterval(crashInterval);
 
-  //       await LossTable.findByIdAndUpdate(
-  //         { _id: find_any_loss_amount_match_with_60_percent?.[0]?._id },
-  //         {
-  //           lossAmount:
-  //             find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount -
-  //             bet_sum,
-  //         }
-  //       );
-
-  //       // thisFunctonMustBePerFormAfterCrash(
-  //       //   Number(`${seconds + 1}.${milliseconds}`)
-  //       // );
-  //       return;
-  //     }
-  //   } else {
-  //     if (find_any_loss_amount_match_with_60_percent?.[0]) {
-  //       await LossTable.findByIdAndDelete({
-  //         _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
-  //       });
-  //       const total_value_bet_amount_which_is_grater_than_lossAmount =
-  //         bet_sum - find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount;
-  //       if (total_value_bet_amount_which_is_grater_than_lossAmount > 0)
-  //         this_is_recusive_function_for_remove_all_lossAmount(
-  //           total_value_bet_amount_which_is_grater_than_lossAmount
-  //         );
-  //     }
-  //   }
-  // }
   async function this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
     bet_sum
   ) {
@@ -1006,7 +943,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
 ////////////// testing api's ////////////////////////
 app.post("/api/v1/apply-bet", async (req, res) => {
   try {
-    const { userid, id, amount } = req.body;
+    const { userid, id, amount,button_type } = req.body;
     if (!userid || !id || !amount)
       return res.status(403).json({
         msg: "All field is required",
@@ -1017,6 +954,7 @@ app.post("/api/v1/apply-bet", async (req, res) => {
       amount: amount,
       amountcashed: 0,
       multiplier: 0,
+      button_type:button_type
     };
     bet_data.push(new_data);
     // const user = await User.findOne({ _id: userid });
@@ -1037,8 +975,8 @@ app.post("/api/v1/apply-bet", async (req, res) => {
 
 app.post("/api/v1/cash-out", async (req, res) => {
   try {
-    const { userid, id, amount, multiplier } = req.body;
-    if (!userid || !id || !amount || !multiplier)
+    const { userid, id, amount, multiplier,button_type } = req.body;
+    if (!userid || !id || !amount || !multiplier || !button_type)
       return res.status(403).json({
         msg: "All field is required",
       });
@@ -1050,7 +988,7 @@ app.post("/api/v1/cash-out", async (req, res) => {
     // );
 
     bet_data.forEach((item) => {
-      if (item.id === id) {
+      if (item.id === id && item.button_type === button_type) {
         item.amountcashed = amount;
         item.multiplier = multiplier;
       }
