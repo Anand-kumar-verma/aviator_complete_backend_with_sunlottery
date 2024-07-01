@@ -987,14 +987,14 @@ app.post("/api/v1/cash-out", async (req, res) => {
 //////////////////////  ledger entry to be transfer into sql database /////////////////////////////////
 
 // aviator band huaa 12 bje
-schedule.scheduleJob("14 15 * * *", async function () {
+schedule.scheduleJob("0 0 * * *", async function () {
   // generateAndSendMessage(24.00,"no");
   boolean = true;
   generateAndSendMessage();
   start_aviator_closing();
 });
 // aviator start huaa 1 bje fir se
-schedule.scheduleJob("18 15 * * *", async function () {
+schedule.scheduleJob("0 1 * * *", async function () {
   boolean = false;
   generateAndSendMessage();
 });
