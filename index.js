@@ -421,20 +421,14 @@ async function table_generateround() {
   }
 }
 table_generateround();
-
-async function generateAndSendMessage(data, loss_amount, get_counter) {
-  if (data === "no") return;
-  // const round = await GameRound?.find({});
-
-  // const newround = await GameRound.findOneAndUpdate(
-  //   { _id: round?.[0]?._id },
-  //   { $inc: { round: 1 } }
-  // );
-
+let boolean = false;
+async function generateAndSendMessage(loss_amount, get_counter) {
   let timerInterval;
   let crashInterval;
+
   let counterboolean = true;
   let total_bet_candidate = 0;
+
   // await applyBet.deleteMany({})
   const time = Math.floor(100 + Math.random() * (900 - 100));
   console.log(time, "this is time to send to the uer or client");
@@ -452,6 +446,14 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
   ////////////////////////////// interval for timer //////////////////////////////////////////////
 
   timerInterval = setInterval(async () => {
+    if (boolean) {
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
+      clearInterval(timerInterval);
+      clearInterval(crashInterval);
+      thisFunctonMustBePerFormAfterCrash(Number(`${1}.${1}`), "no");
+      return;
+    }
     if (milliseconds === 100) {
       seconds += 1;
       milliseconds = 0;
@@ -478,11 +480,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
 
   ///////////////////////////////////// thsi is the calculation of total cashout sum
   let bet_sum = 0;
-  // let loss_amount = 0;
   crashInterval = setInterval(async () => {
-    // const set_counter = await SetCounter.find({});
-    // get_counter = set_counter?.[0]?.counter || 0;
-
     //////////////////////get counter         ////////////////////////////////////////////
 
     /// calculation for apply all bets summesion////////////////////////////
@@ -493,7 +491,6 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
 
     const cash_out_sum = bet_data?.reduce((a, b) => a + b?.amountcashed, 0);
     const total_amount_ka_60_percent = bet_sum * (60 / 100); /// 60 percent se upar jayega to crash kra dena hai
-
 
     /////////////////// condition for loss amount //////////////////////////
 
@@ -568,19 +565,6 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
             clearInterval(timerInterval);
             clearInterval(crashInterval);
 
-            // await LossTable.findByIdAndDelete({
-            //   _id: find_any_loss_amount_match_with_60_percent?.[0]._id,
-            // });
-
-            // const total_value_bet_amount_which_is_grater_than_lossAmount =
-            //   bet_sum -
-            //   find_any_loss_amount_match_with_60_percent?.[0]?.lossAmount;
-
-            // this_is_recusive_function_for_remove_all_lossAmount(
-            //   total_value_bet_amount_which_is_grater_than_lossAmount
-            // );
-           
-
             thisFunctonMustBePerFormAfterCrash(
               Number(`${seconds}.${milliseconds}`),
               "recursive_functoin_for_all_removel_amount"
@@ -603,19 +587,17 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     ///////////////////////////////////// thsi is the calculation of total cashout sum
 
     /////////// conditoin for that if total amount is grater or equal that 500 Rs. creash ////////////////////
-     if (total_bet_candidate <= 5 && bet_sum >= 500) {
+    if (total_bet_candidate <= 5 && bet_sum >= 500) {
       clearInterval(timerInterval);
       clearInterval(crashInterval);
       clearInterval(timerInterval);
       clearInterval(crashInterval);
-      thisFunctonMustBePerFormAfterCrash(
-        Number(`${seconds}.${milliseconds}`)
-      );
+      thisFunctonMustBePerFormAfterCrash(Number(`${seconds}.${milliseconds}`));
       return;
     }
     ////////////////////// conndition is that means agar cashout 60% se jyada huaa to crash kra do///////////////
-     if (cash_out_sum > total_amount_ka_60_percent) {
-      console.log("Function is called now 60 percent se jyada")
+    if (cash_out_sum > total_amount_ka_60_percent) {
+      console.log("Function is called now 60 percent se jyada");
       clearInterval(timerInterval);
       clearInterval(crashInterval);
       clearInterval(timerInterval);
@@ -638,7 +620,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
       ///////////////// this is the condition that means if cashout is grater than //////////////////////
     }
     //////////////////// agar bet lgi hui hai to  second 4 se jyada nhi hone chahiye (+1 krna pdega hmesa q ki ui me +1 karke dikhaya gya hai each and everything)
-     if (bet_sum > 0) {
+    if (bet_sum > 0) {
       if (Number(seconds >= 3)) {
         clearInterval(timerInterval);
         clearInterval(crashInterval);
@@ -712,12 +694,11 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
     }
   }
 
-
   async function this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
     bet_sum
   ) {
     console.log("Anand ji ka function call huaa", bet_sum);
-  
+
     const find_any_loss_amount_match_with_60_percent =
       await LossTable.aggregate([
         {
@@ -727,7 +708,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
           $limit: 1, // Limit the result to the first document
         },
       ]);
-  
+
     // this is the base case..
     if (
       !find_any_loss_amount_match_with_60_percent ||
@@ -736,25 +717,25 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
       await SetCounter.findOneAndUpdate({}, { counter: 0 });
       return;
     }
-  
+
     if (
       find_any_loss_amount_match_with_60_percent[0] &&
       find_any_loss_amount_match_with_60_percent[0].lossAmount > bet_sum
     ) {
       const remaining_amount =
         find_any_loss_amount_match_with_60_percent[0].lossAmount - bet_sum;
-  
+
       if (remaining_amount > 0) {
         clearInterval(timerInterval);
         clearInterval(crashInterval);
-  
+
         await LossTable.findByIdAndUpdate(
           { _id: find_any_loss_amount_match_with_60_percent[0]._id },
           {
             lossAmount: remaining_amount,
           }
         );
-  
+
         return;
       }
     } else {
@@ -762,10 +743,10 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
         await LossTable.findByIdAndDelete({
           _id: find_any_loss_amount_match_with_60_percent[0]._id,
         });
-  
+
         const total_value_bet_amount_which_is_greater_than_lossAmount =
           bet_sum - find_any_loss_amount_match_with_60_percent[0].lossAmount;
-  
+
         if (total_value_bet_amount_which_is_greater_than_lossAmount > 0) {
           return this_is_recusive_function_for_remove_all_lossAmount_if_counter_greater_than_3(
             total_value_bet_amount_which_is_greater_than_lossAmount
@@ -773,14 +754,13 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
         }
       }
     }
-  
+
     // Check if there are any remaining documents
     const remaining_documents = await LossTable.find({}).countDocuments();
     if (remaining_documents === 0) {
       await SetCounter.findOneAndUpdate({}, { counter: 0 });
     }
   }
-  
 
   async function thisFunctonMustBePerFormAfterCrash(time, msg) {
     clearInterval(timerInterval);
@@ -805,7 +785,6 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
       msg ===
       "loss_if_loss_jyada_hai_bet_amount_se_aur_60_percent_se_koi_match_bhi_kiya_hai"
     ) {
-     
       let bet_sum = bet_data?.reduce((a, b) => a + b.amount, 0);
       const percent_60_bet_amount = bet_sum * (100 / 60);
       const find_any_loss_amount_match_with_60_percent =
@@ -935,7 +914,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
 
     setTimeout(() => {
       bet_data = [];
-      generateAndSendMessage("yes", loss_amount, get_counter);
+      msg !== "no" && generateAndSendMessage("yes", loss_amount, get_counter);
     }, 30000);
   }
 }
@@ -943,7 +922,7 @@ async function generateAndSendMessage(data, loss_amount, get_counter) {
 ////////////// testing api's ////////////////////////
 app.post("/api/v1/apply-bet", async (req, res) => {
   try {
-    const { userid, id, amount,button_type } = req.body;
+    const { userid, id, amount, button_type } = req.body;
     if (!userid || !id || !amount)
       return res.status(403).json({
         msg: "All field is required",
@@ -954,7 +933,7 @@ app.post("/api/v1/apply-bet", async (req, res) => {
       amount: amount,
       amountcashed: 0,
       multiplier: 0,
-      button_type:button_type
+      button_type: button_type,
     };
     bet_data.push(new_data);
     // const user = await User.findOne({ _id: userid });
@@ -975,7 +954,7 @@ app.post("/api/v1/apply-bet", async (req, res) => {
 
 app.post("/api/v1/cash-out", async (req, res) => {
   try {
-    const { userid, id, amount, multiplier,button_type } = req.body;
+    const { userid, id, amount, multiplier, button_type } = req.body;
     if (!userid || !id || !amount || !multiplier || !button_type)
       return res.status(403).json({
         msg: "All field is required",
@@ -1008,13 +987,16 @@ app.post("/api/v1/cash-out", async (req, res) => {
 //////////////////////  ledger entry to be transfer into sql database /////////////////////////////////
 
 // aviator band huaa 12 bje
-schedule.scheduleJob("0 0 * * *", async function () {
-  // generateAndSendMessage("no");
-  // start_aviator_closing();
+schedule.scheduleJob("14 15 * * *", async function () {
+  // generateAndSendMessage(24.00,"no");
+  boolean = true;
+  generateAndSendMessage();
+  start_aviator_closing();
 });
 // aviator start huaa 1 bje fir se
-schedule.scheduleJob("0 1 * * *", async function () {
-  // generateAndSendMessage("yes");
+schedule.scheduleJob("18 15 * * *", async function () {
+  boolean = false;
+  generateAndSendMessage();
 });
 
 ////////// closing start in aviator //////////////////
@@ -1049,6 +1031,30 @@ async function start_aviator_closing() {
         }
         try {
           await ApplyBetLedger.deleteOne({ _id: element._id });
+        } catch (deleteError) {
+          console.error("Error deleting document: ", deleteError);
+        }
+      });
+    });
+    // backup of aviator crash
+    const crashHistory = await GameHistory.find({});
+    crashHistory?.forEach(async (element) => {
+      const insertQuery = `INSERT INTO aviator_game_history (round, multiplier, createdAt, updatedAt) VALUES (?, ?, ?, ?);`;
+
+      const values = [
+        element?.round,
+        element?.multiplier,
+        element?.createdAt,
+        element?.updatedAt,
+      ];
+
+      con.query(insertQuery, values, async (err, result) => {
+        if (err) {
+          console.error("Error executing insert query: ", err);
+          return;
+        }
+        try {
+          await GameHistory.deleteOne({ _id: element._id });
         } catch (deleteError) {
           console.error("Error deleting document: ", deleteError);
         }
