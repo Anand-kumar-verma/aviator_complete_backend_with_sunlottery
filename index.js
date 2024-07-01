@@ -3,11 +3,12 @@ const { io, httpServer, app } = require("./config/socket");
 const cors = require("cors");
 const todoRoutes = require("./routes/todos");
 require("dotenv").config();
+const soment = require("moment-timezone");
 const schedule = require("node-schedule");
 const axios = require("axios");
 const mysql = require("mysql");
 const SetCounter = require("./models/SetCounter");
-const applyBet = require("./models/applyBet");
+const moment = require("moment");
 const LossTable = require("./models/LossTable");
 const ApplyBetLedger = require("./models/ApplyBetLedger");
 const User = require("./models/User");
@@ -401,26 +402,7 @@ app.get("/api/v1/topw11winningInformation", async (req, res) => {
   });
 });
 
-///////////////////////////// aviaot timer ///////////////////////////
-let x = true;
-async function table_generateround() {
-  // const data = await GameRound.insertMany({
-  //   round: 202410,
-  // });
 
-  if (x) {
-    generateAndSendMessage("yes");
-
-    console.log("Waiting for the next minute to start...");
-    const now = new Date();
-    const secondsUntilNextMinute = 60 - now.getSeconds();
-    setTimeout(() => {
-      // generateAndSendMessage("yes")
-      x = false;
-    }, secondsUntilNextMinute * 1000);
-  }
-}
-table_generateround();
 let boolean = false;
 async function generateAndSendMessage(loss_amount, get_counter) {
   let timerInterval;
@@ -1388,6 +1370,344 @@ app.post(
 );
 
 ///////// remaining wingo and trx timer /////////////////
+
+// color prediction game time generated every 1 min
+function generatedTimeEveryAfterEveryOneMin() {
+  const job = schedule.scheduleJob("* * * * * *", function () {
+    const currentTime = new Date();
+    const timeToSend =
+      currentTime.getSeconds() > 0
+        ? 60 - currentTime.getSeconds()
+        : currentTime.getSeconds();
+    io.emit("onemin", timeToSend); // Emit the formatted time
+    if (timeToSend === 3) {
+      // oneMinCheckResult();
+      oneMinColorWinning();
+    }
+  });
+}
+const oneMinCheckResult = async () => {
+  try {
+    await axios.get(`https://admin.sunlottery.fun/api/checkresult`);
+  } catch (e) {
+    console.log(e);
+  }
+};
+const oneMinColorWinning = async () => {
+  try {
+    await axios.get(
+      `https://admin.sunlottery.fun/api/colour_winning?id=1&gid=1`
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+// color prediction game time generated every 3 min
+const generatedTimeEveryAfterEveryThreeMin = () => {
+  let min = 2;
+  const rule = new schedule.RecurrenceRule();
+  rule.second = new schedule.Range(0, 59);
+  const job = schedule.scheduleJob("* * * * * *", function () {
+    const currentTime = new Date().getSeconds(); // Get the current time
+    const timeToSend = currentTime > 0 ? 60 - currentTime : currentTime;
+    io.emit("threemin", `${min}_${timeToSend}`);
+    if (min === 0 && timeToSend === 25) {
+      // oneMinCheckResult2min();
+      oneMinColorWinning2min();
+    }
+    if (currentTime === 0) {
+      min--;
+      if (min < 0) min = 2; // Reset min to 2 when it reaches 0
+    }
+  });
+};
+
+const oneMinCheckResult2min = async () => {
+  try {
+    await axios.get(`https://admin.sunlottery.fun/api/checkresult`);
+  } catch (e) {
+    console.log(e);
+  }
+};
+const oneMinColorWinning2min = async () => {
+  try {
+    await axios.get(
+      `https://admin.sunlottery.fun/api/colour_winning?id=2&gid=2`
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const generatedTimeEveryAfterEveryFiveMin = () => {
+  let min = 4;
+  const rule = new schedule.RecurrenceRule();
+  rule.second = new schedule.Range(0, 59);
+  const job = schedule.scheduleJob("* * * * * *", function () {
+    const currentTime = new Date().getSeconds(); // Get the current time
+    const timeToSend = currentTime > 0 ? 60 - currentTime : currentTime;
+    io.emit("fivemin", `${min}_${timeToSend}`);
+
+    if (
+      timeToSend === 40 && // this is for sec
+      min === 0 // this is for minut
+    ) {
+      // oneMinCheckResult3sec();
+      oneMinColorWinning3sec();
+    }
+    ///
+    if (currentTime === 0) {
+      min--;
+      if (min < 0) min = 4; // Reset min to 2 when it reaches 0
+    }
+  });
+};
+
+const oneMinCheckResult3sec = async () => {
+  try {
+    await axios.get(`https://admin.sunlottery.fun/api/checkresult`);
+  } catch (e) {
+    console.log(e);
+  }
+};
+const oneMinColorWinning3sec = async () => {
+  try {
+    await axios.get(
+      `https://admin.sunlottery.fun/api/colour_winning?id=3&gid=3`
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+// color prediction game time generated every 1 min
+function generatedTimeEveryAfterEveryOneMinTRX() {
+  let three = 0;
+  let five = 0;
+  const rule = new schedule.RecurrenceRule();
+  rule.second = new schedule.Range(0, 59);
+  const job = schedule.scheduleJob(rule, function () {
+    const currentTime = new Date();
+    const timeToSend =
+      currentTime.getSeconds() > 0
+        ? 60 - currentTime.getSeconds()
+        : currentTime.getSeconds();
+    io.emit("onemintrx", timeToSend);
+    if (timeToSend === 6) {
+      const datetoAPISend = parseInt(new Date().getTime().toString());
+      const actualtome = soment.tz("Asia/Kolkata");
+      const time = actualtome.add(8, "hours").valueOf();
+      try {
+        if (three === 2) {
+          three = 0;
+        } else {
+          three++;
+        }
+
+        if (five === 4) {
+          five = 0;
+        } else {
+          five++;
+        }
+        setTimeout(async () => {
+          const res = await axios.get(
+            `https://apilist.tronscanapi.com/api/block?sort=-balance&start=0&limit=20&producer=&number=&start_timestamp=${datetoAPISend}&end_timestamp=${datetoAPISend}`
+          );
+          if (res?.data?.data[0]) {
+            const obj = res.data.data[0];
+            const fd = new FormData();
+            fd.append("hash", `**${obj.hash.slice(-4)}`);
+            fd.append("digits", `${obj.hash.slice(-5)}`);
+            fd.append("number", obj.number);
+            fd.append("time", moment(time).format("HH:mm:ss"));
+
+            const newString = obj.hash;
+            let num = null;
+            for (let i = newString.length - 1; i >= 0; i--) {
+              if (!isNaN(parseInt(newString[i]))) {
+                num = parseInt(newString[i]);
+                break;
+              }
+            }
+            fd.append("slotid", num);
+            fd.append("overall", JSON.stringify(obj));
+            //  trx 1
+            try {
+              const response = await axios.post(
+                "https://admin.sunlottery.fun/api/insert-one-trx",
+                fd
+              );
+            } catch (e) {
+              console.log(e);
+            }
+            try {
+              const response = await axios.get(
+                `https://admin.sunlottery.fun/api/trx-winning-result?number=${num}&gameid=1`
+              );
+
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }, [6000]);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  });
+}
+let twoMinTrxJob;
+// sdafas??
+const generatedTimeEveryAfterEveryThreeMinTRX = () => {
+  let min = 2;
+   twoMinTrxJob = schedule.scheduleJob("* * * * * *", function () {
+    const currentTime = new Date().getSeconds(); // Get the current time
+    const timeToSend = currentTime > 0 ? 60 - currentTime : currentTime;
+    io.emit("threemintrx", `${min}_${timeToSend}`);
+    if (min === 0 && timeToSend === 6) {
+      const datetoAPISend = parseInt(new Date().getTime().toString());
+      const actualtome = soment.tz("Asia/Kolkata");
+      const time = actualtome.add(8, "hours").valueOf();
+      try {
+        setTimeout(async () => {
+          const res = await axios.get(
+            `https://apilist.tronscanapi.com/api/block?sort=-balance&start=0&limit=20&producer=&number=&start_timestamp=${datetoAPISend}&end_timestamp=${datetoAPISend}`
+          );
+          if (res?.data?.data[0]) {
+            const obj = res.data.data[0];
+            const fd = new FormData();
+            fd.append("hash", `**${obj.hash.slice(-4)}`);
+            fd.append("digits", `${obj.hash.slice(-5)}`);
+            fd.append("number", obj.number);
+            fd.append("time", moment(time).format("HH:mm:ss"));
+            const newString = obj.hash;
+            let num = null;
+            for (let i = newString.length - 1; i >= 0; i--) {
+              if (!isNaN(parseInt(newString[i]))) {
+                num = parseInt(newString[i]);
+                break;
+              }
+            }
+            fd.append("slotid", num);
+            fd.append("overall", JSON.stringify(obj));
+            //  trx 3
+            try {
+              const response = await axios.post(
+                "https://admin.sunlottery.fun/api/insert-three-trx",
+                fd
+              );
+            } catch (e) {
+              console.log(e);
+            }
+            try {
+              const response = await axios.get(
+                `https://admin.sunlottery.fun/api/trx-winning-result?number=${num}&gameid=2`
+              );
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }, [6000]);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    if (currentTime === 0) {
+      min--;
+      if (min < 0) min = 2; // Reset min to 2 when it reaches 0
+    }
+  });
+};
+let threeMinTrxJob;
+const generatedTimeEveryAfterEveryFiveMinTRX = () => {
+  let min = 4;
+  threeMinTrxJob = schedule.scheduleJob("* * * * * *", function () {
+    const currentTime = new Date().getSeconds(); // Get the current time
+    const timeToSend = currentTime > 0 ? 60 - currentTime : currentTime;
+    io.emit("fivemintrx", `${min}_${timeToSend}`);
+    if (min === 0 && timeToSend === 6) {
+      const datetoAPISend = parseInt(new Date().getTime().toString());
+      const actualtome = soment.tz("Asia/Kolkata");
+      const time = actualtome.add(8, "hours").valueOf();
+      try {
+        setTimeout(async () => {
+          const res = await axios.get(
+            `https://apilist.tronscanapi.com/api/block?sort=-balance&start=0&limit=20&producer=&number=&start_timestamp=${datetoAPISend}&end_timestamp=${datetoAPISend}`
+          );
+          if (res?.data?.data[0]) {
+            const obj = res.data.data[0];
+            const fd = new FormData();
+            fd.append("hash", `**${obj.hash.slice(-4)}`);
+            fd.append("digits", `${obj.hash.slice(-5)}`);
+            fd.append("number", obj.number);
+            fd.append("time", moment(time).format("HH:mm:ss"));
+            const newString = obj.hash;
+            let num = null;
+            for (let i = newString.length - 1; i >= 0; i--) {
+              if (!isNaN(parseInt(newString[i]))) {
+                num = parseInt(newString[i]);
+                break;
+              }
+            }
+            fd.append("slotid", num);
+            fd.append("overall", JSON.stringify(obj));
+            //  trx 3
+            try {
+              const response = await axios.post(
+                "https://admin.sunlottery.fun/api/insert-five-trx",
+                fd
+              );
+            } catch (e) {
+              console.log(e);
+            }
+            try {
+              const response = await axios.get(
+                `https://admin.sunlottery.fun/api/trx-winning-result?number=${num}&gameid=3`
+              );
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }, [6000]);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    if (currentTime === 0) {
+      min--;
+      if (min < 0) min = 4; // Reset min to 4 when it reaches 0
+    }
+  });
+};
+
+
+
+
+let y = true;
+
+if (y) {
+  generateAndSendMessage("yes");
+  console.log("Waiting for the next minute to start...");
+  const now = new Date();
+  const secondsUntilNextMinute = 60 - now.getSeconds();
+  setTimeout(() => {
+    generatedTimeEveryAfterEveryOneMinTRX()
+    generatedTimeEveryAfterEveryOneMin();
+    generatedTimeEveryAfterEveryThreeMin();
+    generatedTimeEveryAfterEveryFiveMin();
+    y = false;
+  }, secondsUntilNextMinute * 1000);
+}
+const finalRescheduleJob = schedule.scheduleJob(
+  "15,30,45,0 * * * *",
+  function () {
+    twoMinTrxJob?.cancel();
+    threeMinTrxJob?.cancel();
+    generatedTimeEveryAfterEveryThreeMinTRX();
+    generatedTimeEveryAfterEveryFiveMinTRX();
+  }
+);
 
 app.get("/", (req, res) => {
   res.send(`<h1>This is simple port which is running at -====> ${PORT}</h1>`);
