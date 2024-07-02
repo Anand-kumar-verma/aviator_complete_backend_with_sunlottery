@@ -136,12 +136,28 @@ exports.adminWalletFunction = async (req, res) => {
 
     const response = await obj.save();
 
-   return res.status(200).json({
+    return res.status(200).json({
       msg: "Data save successfully",
       data: response,
     });
   } catch (e) {
-   return res.status(500).json({
+    return res.status(500).json({
+      msg: "Something went wrong in create user query",
+    });
+  }
+};
+exports.getTopRecordsAviator = async (req, res) => {
+  try {
+    const data = await ApplyBetLedger.find({})
+      .sort({ amountcashed: -1 })
+      .populate("main_id")
+      .limit(10);
+    return res.status(200).json({
+      msg: "Data save successfully",
+      data: data,
+    });
+  } catch (e) {
+    return res.status(500).json({
       msg: "Something went wrong in create user query",
     });
   }
@@ -276,7 +292,6 @@ exports.getMyHistoryByID = async (req, res) => {
 
 exports.getAviatorWalletAmountAdmin = async (req, res) => {
   try {
-
     const data = await AdminWallet.find({});
 
     if (!data)
@@ -294,7 +309,6 @@ exports.getAviatorWalletAmountAdmin = async (req, res) => {
 
 exports.getLederData = async (req, res) => {
   try {
-
     const data = await ApplyBetLedger.find({}).populate("main_id").limit(100);
     if (!data)
       return res.status(400).json({

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 // const { loginFun, dashboardCounter, getAllAttendanceList, deleteAttendanceById, updateAttendanceById, getAllPlayer, updatePlayerRecord, updatePlayerStatus, addPlayer, getUserByRedId, getUserDataById, changePassword, withdrawlRequestFun, withdrawlApprovedFun, withdrawlRejectFun, withdrlApprovedFilterFun, withdrlRejectFilterFun, addSubAdmin, getSubAdminList, getAllAssignedMenu, shwoMenu, viewAllAsignedMenu, getSubMenu, addAttendance, addFund, getAllDirectReferralByUserId, getAllDownLineByUserId, depositRequestFilterCricket, depositRequestFilterWingo, withdrawlRequestReportCricket, withdrawlRequestReportWingo, colorPredictionOneMin, colorPredictionOneMinGetNextId, manuallyWinning, manuallyupdatePercentage, getFundHistory } = require("../controller/Aviator/login");
-const { createUser, applybetFunction, cashOutFunction, adminWalletFunction, userLoginFunctoin, lossAmountFunction, getWalletByUserId, getGameHistory, getMyHistoryByID, getAviatorWalletAmountAdmin, getLederData } = require("../controller/Auth");
+const { createUser, applybetFunction, cashOutFunction, adminWalletFunction, userLoginFunctoin, lossAmountFunction, getWalletByUserId, getGameHistory, getMyHistoryByID, getAviatorWalletAmountAdmin, getLederData, getTopRecordsAviator } = require("../controller/Auth");
 
 
 
@@ -49,6 +49,7 @@ router.post("/createuser", createUser);
 // router.post("/apply-bet", applybetFunction);
 // router.post("/cash-out", cashOutFunction);
 router.post("/admin-wallet", adminWalletFunction);
+router.get("/get-top-users", getTopRecordsAviator);
 router.post("/login", userLoginFunctoin);
 router.post("/lossamount", lossAmountFunction);
 router.post("/get-wallet-amount-by-id", getWalletByUserId);
