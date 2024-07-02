@@ -1704,19 +1704,8 @@ const generatedTimeEveryAfterEveryFiveMinTRX = () => {
 let y = true;
 
 if (y) {
-  let loss_amount = await LossTable.aggregate([
-    {
-      $group: {
-        _id: null,
-        totalAmount: { $sum: "$lossAmount" },
-      },
-    },
-  ]).then((result) => {
-    return result.length > 0 ? result[0].totalAmount : 0;
-  });
-  const set_counter = await SetCounter.find({});
-  let get_counter = set_counter?.[0]?.counter || 0;
-  generateAndSendMessage(loss_amount || 0, get_counter || 0);
+
+  generateAndSendMessage(0,0);
 
   console.log("Waiting for the next minute to start...");
   const now = new Date();
