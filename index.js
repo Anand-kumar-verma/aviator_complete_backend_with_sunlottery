@@ -846,15 +846,27 @@ async function generateAndSendMessage(loss_amount, get_counter) {
     });
     const response = await obj.save();
 
-    bet_data.forEach(async (element) => {
-      const obj = new ApplyBetLedger({
-        main_id: element.userid,
-        userid: element.id,
-        amount: element.amount,
-        amountcashed: element.amountcashed,
-        multiplier: element.multiplier,
+    const saveBetLedgers = async (bet_data) => {
+      const promises = bet_data.map(async (element) => {
+        const obj = new ApplyBetLedger({
+          main_id: element.userid,
+          userid: element.id,
+          amount: element.amount,
+          amountcashed: element.amountcashed,
+          multiplier: element.multiplier,
+        });
+        return obj.save();
       });
-      await obj.save();
+    
+      // Wait for all save operations to complete
+      await Promise.all(promises);
+    };
+    
+    // Example usage:
+    saveBetLedgers(bet_data).then(() => {
+      console.log('All ApplyBetLedger objects saved successfully');
+    }).catch(err => {
+      console.error('Error saving ApplyBetLedger objects:', err);
     });
 
     setTimeout(() => {
@@ -885,21 +897,59 @@ async function generateAndSendMessage(loss_amount, get_counter) {
           (Number(total_bet_sum) - Number(total_crashed_sum)),
       }
     );
-    bet_data.forEach(async (element) => {
-      const getuser = await User.findOne({ _id: element.userid });
-      const response = await User.findByIdAndUpdate(
+    console.log(bet_data,"this is simple testing");
+
+    // bet_data.forEach(async (element) => {
+    //   const getuser = await User.findOne({ _id: element.userid });
+    //   const response = await User.findByIdAndUpdate(
+    //     { _id: getuser._id },
+    //     {
+    //       wallet:
+    //         getuser.wallet +
+    //         Number(
+    //           element.amountcashed > 0
+    //             ? element.amountcashed - element.amount
+    //             : -element.amount
+    //         ),
+    //     }
+    //   );
+    // });
+const updateUserWallets = async (bet_data) => {
+  // Step 1: Group bet_data by userid and calculate the total wallet change for each user
+  const userWalletChanges = bet_data.reduce((acc, element) => {
+    const userId = element.userid;
+    const amountChange = Number(element.amountcashed > 0 ? element.amountcashed - element.amount : -element.amount);
+
+    if (!acc[userId]) {
+      acc[userId] = 0;
+    }
+    acc[userId] += amountChange;
+    return acc;
+  }, {});
+
+  // Step 2: Update each user once with the aggregated wallet change
+  const updatePromises = Object.keys(userWalletChanges).map(async (userId) => {
+    const getuser = await User.findOne({ _id: userId });
+    if (getuser) {
+      const newWalletAmount = getuser.wallet + userWalletChanges[userId];
+      return User.findByIdAndUpdate(
         { _id: getuser._id },
-        {
-          wallet:
-            getuser.wallet +
-            Number(
-              element.amountcashed > 0
-                ? element.amountcashed - element.amount
-                : -element.amount
-            ),
-        }
+        { wallet: newWalletAmount },
+        { new: true }
       );
-    });
+    }
+  });
+
+  // Step 3: Wait for all updates to complete
+  await Promise.all(updatePromises);
+};
+
+// Example usage:
+updateUserWallets(bet_data).then(() => {
+  console.log('User wallets updated successfully');
+}).catch(err => {
+  console.error('Error updating user wallets:', err);
+});
 
     setTimeout(() => {
       bet_data = [];
