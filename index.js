@@ -402,7 +402,6 @@ app.get("/api/v1/topw11winningInformation", async (req, res) => {
   });
 });
 
-
 let boolean = false;
 async function generateAndSendMessage(loss_amount, get_counter) {
   let timerInterval;
@@ -587,12 +586,20 @@ async function generateAndSendMessage(loss_amount, get_counter) {
       counterboolean = false;
       ///////////////// this is the condition that means if cashout is grater than //////////////////////
       if (cash_out_sum > bet_sum) {
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds}.${milliseconds}`),
           "sixty_percent_se_jyada_ka_crash"
         );
         return;
-      } else {
+      } else if (cash_out_sum < bet_sum) {
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
+        clearInterval(timerInterval);
+        clearInterval(crashInterval);
         thisFunctonMustBePerFormAfterCrash(
           Number(`${seconds}.${milliseconds}`),
           "null"
@@ -896,7 +903,9 @@ async function generateAndSendMessage(loss_amount, get_counter) {
 
     setTimeout(() => {
       bet_data = [];
-      msg !== "no" && generateAndSendMessage("yes", loss_amount, get_counter);
+      msg !== "no" &&
+        !boolean &&
+        generateAndSendMessage(loss_amount, get_counter);
     }, 30000);
   }
 }
@@ -972,13 +981,25 @@ app.post("/api/v1/cash-out", async (req, res) => {
 schedule.scheduleJob("0 0 * * *", async function () {
   // generateAndSendMessage(24.00,"no");
   boolean = true;
-  generateAndSendMessage();
+  // generateAndSendMessage();
   start_aviator_closing();
 });
 // aviator start huaa 1 bje fir se
 schedule.scheduleJob("0 1 * * *", async function () {
   boolean = false;
-  generateAndSendMessage();
+  let loss_amount = await LossTable.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalAmount: { $sum: "$lossAmount" },
+      },
+    },
+  ]).then((result) => {
+    return result.length > 0 ? result[0].totalAmount : 0;
+  });
+  const set_counter = await SetCounter.find({});
+  let get_counter = set_counter?.[0]?.counter || 0;
+  generateAndSendMessage(loss_amount, get_counter);
 });
 
 ////////// closing start in aviator //////////////////
@@ -1545,7 +1566,6 @@ function generatedTimeEveryAfterEveryOneMinTRX() {
               const response = await axios.get(
                 `https://admin.sunlottery.fun/api/trx-winning-result?number=${num}&gameid=1`
               );
-
             } catch (e) {
               console.log(e);
             }
@@ -1561,7 +1581,7 @@ let twoMinTrxJob;
 // sdafas??
 const generatedTimeEveryAfterEveryThreeMinTRX = () => {
   let min = 2;
-   twoMinTrxJob = schedule.scheduleJob("* * * * * *", function () {
+  twoMinTrxJob = schedule.scheduleJob("* * * * * *", function () {
     const currentTime = new Date().getSeconds(); // Get the current time
     const timeToSend = currentTime > 0 ? 60 - currentTime : currentTime;
     io.emit("threemintrx", `${min}_${timeToSend}`);
@@ -1681,18 +1701,15 @@ const generatedTimeEveryAfterEveryFiveMinTRX = () => {
   });
 };
 
-
-
-
 let y = true;
 
 if (y) {
-  // generateAndSendMessage("yes");
+  generateAndSendMessage("yes");
   console.log("Waiting for the next minute to start...");
   const now = new Date();
   const secondsUntilNextMinute = 60 - now.getSeconds();
   setTimeout(() => {
-    generatedTimeEveryAfterEveryOneMinTRX()
+    generatedTimeEveryAfterEveryOneMinTRX();
     generatedTimeEveryAfterEveryOneMin();
     generatedTimeEveryAfterEveryThreeMin();
     generatedTimeEveryAfterEveryFiveMin();
