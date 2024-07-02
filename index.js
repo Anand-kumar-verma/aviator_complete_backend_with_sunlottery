@@ -1687,7 +1687,7 @@ const generatedTimeEveryAfterEveryFiveMinTRX = () => {
 let y = true;
 
 if (y) {
-  generateAndSendMessage("yes");
+  // generateAndSendMessage("yes");
   console.log("Waiting for the next minute to start...");
   const now = new Date();
   const secondsUntilNextMinute = 60 - now.getSeconds();
